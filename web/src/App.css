@@ -1,0 +1,25 @@
+.swiper {
+  overflow: hidden;
+  width: 100%;
+  height: 90vh;
+  margin: 5vh 0;
+  display: flex;
+}
+
+.swiper-slide {
+  flex: 0 0 auto;
+  width: 100%;
+  padding: 0 5%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-position: center;
+  background-size: cover;
+}
+
+.swiper-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}

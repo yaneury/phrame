@@ -5,6 +5,7 @@ from typing import Union
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic_settings import BaseSettings
 
 data = {}
@@ -21,6 +22,13 @@ class Settings(BaseSettings):
 settings = Settings()
 app = FastAPI(lifespan=lifespan)
 app.mount("/static", StaticFiles(directory=settings.content_directory), name="static")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/nonce")
 def info():
