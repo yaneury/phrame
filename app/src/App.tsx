@@ -14,10 +14,10 @@ export default function App() {
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_SERVICE_ENDPOINT}/content`);
+        const response = await fetch(`${import.meta.env.VITE_SERVICE_ENDPOINT}/content`);
         const json = await response.json();
-        const images = json["files"].map((filename) => {
-          return `${process.env.REACT_APP_SERVICE_ENDPOINT}/static/${filename}`;
+        const images = json["files"].map((filename: string) => {
+          return `${import.meta.env.VITE_SERVICE_ENDPOINT}/static/${filename}`;
         });
 
         setImages(images);
