@@ -10,6 +10,7 @@ fastapi = "^0.110.0"
 uvicorn = {extras = ["standard"], version = "^0.28.0"}
 pydantic-settings = "^2.2.1"
 python-dotenv = "^1.0.1"
+exceptiongroup = "^1.2.0"
 
 
 [build-system]
