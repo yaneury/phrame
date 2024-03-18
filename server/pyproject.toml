@@ -5,7 +5,7 @@ description = "Backend Service for Phrame project"
 authors = ["Yaneury Fermin <fermin.yaneury@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.10"
 fastapi = "^0.110.0"
 uvicorn = {extras = ["standard"], version = "^0.28.0"}
 pydantic-settings = "^2.2.1"
