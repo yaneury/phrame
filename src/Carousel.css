@@ -1,23 +1,10 @@
 .carousel {
-    /* max-width: 600px; */
-    /* position: relative; */
-    /* margin: 0 auto; */
-}
-
-.carousel .carousel-item,
-.carousel .carousel-item-hidden {
-    display: none; /* hide all slide images not currently being viewed */
-}
-
-.carousel .carousel-item-visible {
-    display: block; /* show current slide image */
-    animation: fadeVisibility 0.5s; /* for fading effect when switching between slides */
-}
-
-.carousel .carousel-item img {
-    width: 100%;
-    /* max-width: 600px; */
-    height: auto;
+  width: 95vw;
+  height: 95vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #FAF9F6;
 }
 
 /* Navigation control styles */
@@ -32,7 +19,7 @@
 
 .carousel .carousel-actions button {
     border-radius: 50px;
-    background-color: white;
+    background-color: red;
     border: 0;
     font-size: 16px;
     font-weight: bold;
@@ -42,14 +29,13 @@
 }
 
 .carousel .carousel-actions button#carousel-button-prev {
-    margin-left: 20px; /* prevent previous button from touching the side*/
+    margin-left: 20px;
 }
 
 .carousel .carousel-actions button#carousel-button-next {
-    margin-right: 20px;  /* prevent next button from touching the side*/
+    margin-right: 20px;
 }
 
-/* hanlde smooth transitions between slides */
 @keyframes fadeVisibility {
     0% {
         opacity: 0;
