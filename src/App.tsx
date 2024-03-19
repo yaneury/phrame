@@ -7,7 +7,7 @@ import "./App.css";
 const App = () => {
   return (
     <div className="container">
-      <Carousel />
+      <Carousel intervalInMs={3000} />
     </div>
   );
 }
