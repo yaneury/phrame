@@ -1,14 +1,6 @@
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
-}
-
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafb);
-}
-
 .container {
-    width: 95vw; /* 90% of the viewport width */
-    height: 95vh; /* 90% of the viewport height */
+    width: 95vw;
+    height: 95vh;
     background-color: #FAF9F6;
     border: 2px solid #000000;
     position: absolute;
@@ -19,4 +11,13 @@
     flex-direction: column;
     justify-content: center;
     text-align: center;
+    overflow: hidden; 
+}
+
+.container img {
+    max-width: 100%; /* Ensures image doesn't exceed container width */
+    max-height: 100%; /* Ensures image doesn't exceed container height */
+    display: block; /* Makes image behave as a block element */
+    margin: 0 auto; /* Centers the image horizontally */
+    object-fit: contain; /* Preserve aspect ratio while fitting */
 }
