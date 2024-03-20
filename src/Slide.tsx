@@ -1,11 +1,25 @@
+import Video from "./Video.tsx";
+
 import "./Slide.css";
 
-interface Props {
+export enum Category {
+  Picture,
+  Video,
+  Note,
+  Quote
+}
+
+export interface Content {
   url: string;
+  category: Category;
+}
+
+interface Props {
+  content: Content;
   visible: boolean;
 }
 
-const Slide = ({ url, visible }: Props) => {
+const Slide = ({ content, visible }: Props) => {
   let classes = ["slide"];
   if (visible) {
     classes.push("fade-visible");
@@ -15,7 +29,10 @@ const Slide = ({ url, visible }: Props) => {
 
   return (
     <div className={classes.join(" ")}>
-      <img src={url} />
+      {content.category === Category.Picture
+        ? <img src={content.url} />
+        : <Video url={content.url} onUpdate={console.log} />
+      }
     </div>
   );
 }

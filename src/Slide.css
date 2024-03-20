@@ -13,7 +13,7 @@
   animation: fadeVisibility 0.5s;
 }
 
-.slide > img {
+.slide > img, video {
   width: auto;
   height: auto;
   max-width: 95vh;

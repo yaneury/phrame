@@ -1,21 +1,22 @@
 import { useState, useEffect, useRef } from "react";
 
-import Slide from "./Slide.tsx";
+import Slide, { Category } from "./Slide.tsx";
 
 import "./Carousel.css";
 
-interface Slide {
-  url: string;
-  visible: boolean;
-}
-
 const DATA = [
-  "/release/turtle.jpg",
-  "/release/a.jpg",
-  "/release/b.jpg",
-  "/release/c.jpg",
-  "/release/d.jpg",
-  "/release/e.jpg"
+  {
+    url: "/release/covid.mp4",
+    category: Category.Video,
+  },
+  {
+    url: "/release/a.jpg",
+    category: Category.Picture,
+  },
+  {
+    url: "/release/d.jpg",
+    category: Category.Picture,
+  },
 ]
 
 interface Props {
@@ -24,12 +25,7 @@ interface Props {
 
 const Carousel = ({ intervalInMs }: Props) => {
   const [position, setPosition] = useState(0);
-  const [slides, _] = useState<Slide[]>(
-    DATA.map((url) => ({
-      url,
-      visible: false
-    }))
-  )
+  const [slides, _] = useState(DATA);
   const timerIdRef = useRef(0);
 
   const startTimer = () => {
@@ -61,8 +57,8 @@ const Carousel = ({ intervalInMs }: Props) => {
 
   return (
     <div className="carousel">
-      {slides.map((s, i) => (
-        <Slide key={i} url={s.url} visible={i === position} />
+      {slides.map((content, i) => (
+        <Slide key={i} content={content} visible={i === position} />
       ))}
       <div className="carousel-actions">
         <button id="carousel-button-prev" onClick={() => onChangeSlide(false)}></button>
