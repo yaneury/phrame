@@ -1,3 +1,4 @@
+import { invoke } from '@tauri-apps/api/tauri'
 import { appDataDir, join } from '@tauri-apps/api/path';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { useState, useEffect, useRef } from "react";
@@ -31,6 +32,8 @@ const Carousel = ({ intervalInMs }: Props) => {
   const timerIdRef = useRef(0);
 
   useEffect(() => {
+    invoke('fetch').then((message) => console.log(message))
+
     const fetchAssetUrls = async () => {
       const appDataDirPath = await appDataDir();
 
