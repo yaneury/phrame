@@ -1,3 +1,5 @@
+import Picture from "./Picture.tsx";
+import Text from "./Text.tsx";
 import Video from "./Video.tsx";
 
 import "./Slide.css";
@@ -5,8 +7,7 @@ import "./Slide.css";
 export enum Category {
   Picture,
   Video,
-  Note,
-  Quote
+  Text
 }
 
 export interface Content {
@@ -29,10 +30,9 @@ const Slide = ({ content, visible }: Props) => {
 
   return (
     <div className={classes.join(" ")}>
-      {content.category === Category.Picture
-        ? <img src={content.url} />
-        : <Video url={content.url} onUpdate={console.log} />
-      }
+      {content.category === Category.Picture && (<Picture url={content.url} />)}
+      {content.category === Category.Video && (<Video url={content.url} onUpdate={console.log} />)}
+      {content.category === Category.Text && (<Text url={content.url} />)}
     </div>
   );
 }

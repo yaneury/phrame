@@ -6,7 +6,20 @@ import Slide, { Category } from "./Slide.tsx";
 
 import "./Carousel.css";
 
-const SEED = ["a.jpg", "b.jpg", "c.jpg", "d.jpg", "e.jpg"]
+const SEED = [
+  {
+    filename: "sample.txt",
+    category: Category.Text,
+  },
+  {
+    filename: "a.jpg",
+    category: Category.Picture,
+  },
+  {
+    filename: "c.jpg",
+    category: Category.Picture,
+  },
+]
 
 interface Props {
   intervalInMs: number;
@@ -21,13 +34,13 @@ const Carousel = ({ intervalInMs }: Props) => {
     const fetchAssetUrls = async () => {
       const appDataDirPath = await appDataDir();
 
-      const results = await Promise.all(SEED.map(async filename => {
+      const results = await Promise.all(SEED.map(async ({ filename, category }) => {
         const filePath = await join(appDataDirPath, `assets/${filename}`);
         const assetUrl = convertFileSrc(filePath);
 
         return {
           url: assetUrl,
-          category: Category.Picture
+          category,
         }
       }));
 
