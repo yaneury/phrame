@@ -4,15 +4,6 @@
   overflow: hidden;
 }
 
-.hidden {
-  display: none;
-}
-
-.fade-visible {
-  display: block;
-  animation: fadeVisibility 0.5s;
-}
-
 .slide > img, video {
   width: auto;
   height: auto;
@@ -22,3 +13,20 @@
   object-fit: cover;
 }
 
+.slide .fade-in {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.slide .show {
+  opacity: 1;
+}
+
+.slide .fade-out {
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.slide .hide {
+  opacity: 0;
+}

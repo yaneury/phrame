@@ -14,21 +14,21 @@ export interface Content {
   category: Category;
 }
 
-interface Props {
-  content: Content;
-  visible: boolean;
+export enum Visibility {
+  FadeIn,
+  Active,
+  FadeOut,
+  Hide
 }
 
-const Slide = ({ content, visible }: Props) => {
-  let classes = ["slide"];
-  if (visible) {
-    classes.push("fade-visible");
-  } else {
-    classes.push("hidden")
-  }
+interface Props {
+  content: Content;
+  visibility: Visibility;
+}
 
+const Slide = ({ content, visibility }: Props) => {
   return (
-    <div className={classes.join(" ")}>
+    <div className="slide">
       {content.category === Category.Picture
         ? <img src={content.url} />
         : <Video url={content.url} onUpdate={console.log} />
