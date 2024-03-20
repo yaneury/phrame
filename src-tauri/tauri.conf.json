@@ -15,6 +15,18 @@
       "shell": {
         "all": false,
         "open": true
+      },
+      "path": {
+        "all": true
+      },
+      "fs": {
+        "readFile": true,
+        "readDir": true,
+        "scope": ["$APPDATA/assets/*"]
+      },
+      "protocol": {
+        "asset": true,
+        "assetScope": ["$APPDATA/assets/*"]
       }
     },
     "windows": [
@@ -25,12 +37,12 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost"
     },
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "com.tauri.dev",
+      "identifier": "com.yaneury.phrame",
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",

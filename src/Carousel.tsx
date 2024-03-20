@@ -1,23 +1,12 @@
+import { appDataDir, join } from '@tauri-apps/api/path';
+import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { useState, useEffect, useRef } from "react";
 
 import Slide, { Category } from "./Slide.tsx";
 
 import "./Carousel.css";
 
-const DATA = [
-  {
-    url: "/release/covid.mp4",
-    category: Category.Video,
-  },
-  {
-    url: "/release/a.jpg",
-    category: Category.Picture,
-  },
-  {
-    url: "/release/d.jpg",
-    category: Category.Picture,
-  },
-]
+const SEED = ["a.jpg", "b.jpg", "c.jpg", "d.jpg", "e.jpg"]
 
 interface Props {
   intervalInMs: number;
@@ -25,8 +14,28 @@ interface Props {
 
 const Carousel = ({ intervalInMs }: Props) => {
   const [position, setPosition] = useState(0);
-  const [slides, _] = useState(DATA);
+  const [slides, setSlides] = useState([]);
   const timerIdRef = useRef(0);
+
+  useEffect(() => {
+    const fetchAssetUrls = async () => {
+      const appDataDirPath = await appDataDir();
+
+      const results = await Promise.all(SEED.map(async filename => {
+        const filePath = await join(appDataDirPath, `assets/${filename}`);
+        const assetUrl = convertFileSrc(filePath);
+
+        return {
+          url: assetUrl,
+          category: Category.Picture
+        }
+      }));
+
+      setSlides(results);
+    };
+
+    fetchAssetUrls();
+  }, []);
 
   const startTimer = () => {
     timerIdRef.current = setInterval(() => {
