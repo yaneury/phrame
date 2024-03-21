@@ -23,9 +23,6 @@ const Carousel = ({ intervalInMs }: Props) => {
       const files: FetchCommandValue[] = await invoke('fetch');
       const appDataDirPath = await appDataDir();
       const results = await Promise.all(files.map(async ({ filename, category }) => {
-        if (category == "unknown")
-          throw Error("Received unknown category");
-
         const path = `assets/${filename}`;
         if (category === "text") {
           return {
@@ -44,7 +41,8 @@ const Carousel = ({ intervalInMs }: Props) => {
         }
       }));
 
-      setContent(results);
+      setContent(results.filter(c => c.kind == Category.Text));
+      // setContent(results);
     };
 
     fetchContent();

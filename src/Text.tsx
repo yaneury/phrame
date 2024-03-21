@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 
 import { readTextFile, BaseDirectory } from '@tauri-apps/api/fs';
 
+import "./Text.css";
+
 interface Props {
   path: string;
   base: BaseDirectory;
@@ -20,7 +22,7 @@ const Text = ({ path, base }: Props) => {
   });
 
   return (
-    <p>{text}</p>
+    <p className="text">{text}</p>
   )
 }
 
