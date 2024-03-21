@@ -12,13 +12,3 @@
   display: block;
   animation: fadeVisibility 0.5s;
 }
-
-.slide > img, video {
-  width: auto;
-  height: auto;
-  max-width: 95vh;
-  max-height: 95vh;
-  display: block;
-  object-fit: cover;
-}
-
