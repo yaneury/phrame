@@ -22,13 +22,18 @@ const SEED = [
   },
 ]
 
+interface Entry {
+  url: string;
+  category: Category;
+}
+
 interface Props {
   intervalInMs: number;
 }
 
 const Carousel = ({ intervalInMs }: Props) => {
   const [position, setPosition] = useState(0);
-  const [slides, setSlides] = useState([]);
+  const [slides, setSlides] = useState<Entry[]>([]);
   const timerIdRef = useRef(0);
 
   useEffect(() => {
