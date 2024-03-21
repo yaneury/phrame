@@ -3,7 +3,8 @@ import { BaseDirectory } from "@tauri-apps/api/fs";
 export enum Category {
   Picture,
   Video,
-  Text
+  Text,
+  Unknown
 }
 
 export interface Asset {
@@ -20,3 +21,8 @@ export interface File {
 export type Content = File | Asset;
 
 export default Content;
+
+export interface FetchCommandValue {
+  category: "text" | "picture" | "video" | "unknown";
+  filename: string;
+}

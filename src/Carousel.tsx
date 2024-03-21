@@ -5,24 +5,9 @@ import { useState, useEffect, useRef } from "react";
 
 import Slide from "./Slide.tsx";
 
-import Content, { Category } from "./models.ts";
+import Content, { Category, FetchCommandValue } from "./models.ts";
 
 import "./Carousel.css";
-
-const SEED = [
-  {
-    filename: "sample.txt",
-    category: Category.Text,
-  },
-  {
-    filename: "a.jpg",
-    category: Category.Picture,
-  },
-  {
-    filename: "c.jpg",
-    category: Category.Picture,
-  },
-]
 
 interface Props {
   intervalInMs: number;
@@ -30,21 +15,22 @@ interface Props {
 
 const Carousel = ({ intervalInMs }: Props) => {
   const [position, setPosition] = useState(0);
-  const [slides, setSlides] = useState<Content[]>([]);
+  const [content, setContent] = useState<Content[]>([]);
   const timerIdRef = useRef(0);
 
   useEffect(() => {
-    invoke('fetch').then((message) => console.log(message))
-
-    const fetchAssetUrls = async () => {
+    const fetchContent = async () => {
+      const files: FetchCommandValue[] = await invoke('fetch');
       const appDataDirPath = await appDataDir();
+      const results = await Promise.all(files.map(async ({ filename, category }) => {
+        if (category == "unknown")
+          throw Error("Received unknown category");
 
-      const results: Content[] = await Promise.all(SEED.map(async ({ filename, category }) => {
         const path = `assets/${filename}`;
-        if (category === Category.Text) {
+        if (category === "text") {
           return {
-            kind: category,
-            path: path,
+            kind: Category.Text,
+            path,
             base: BaseDirectory.AppData
           }
         }
@@ -53,20 +39,20 @@ const Carousel = ({ intervalInMs }: Props) => {
         const assetUrl = convertFileSrc(filePath);
 
         return {
-          kind: category,
+          kind: category === "picture" ? Category.Picture : Category.Video,
           url: assetUrl,
         }
       }));
 
-      setSlides(results);
+      setContent(results);
     };
 
-    fetchAssetUrls();
+    fetchContent();
   }, []);
 
   const startTimer = () => {
     timerIdRef.current = setInterval(() => {
-      setPosition((position + 1) % slides.length);
+      setPosition((position + 1) % content.length);
     }, intervalInMs);
   }
 
@@ -78,10 +64,10 @@ const Carousel = ({ intervalInMs }: Props) => {
   useEffect(() => {
     startTimer();
     return () => clearInterval(timerIdRef.current);
-  }, [slides, position]);
+  }, [content, position]);
 
   const onChangeSlide = (forward: boolean) => {
-    const size = slides.length;
+    const size = content.length;
     if (forward) {
       setPosition((position + 1) % size);
     } else {
@@ -93,8 +79,8 @@ const Carousel = ({ intervalInMs }: Props) => {
 
   return (
     <div className="carousel">
-      {slides.map((content, i) => (
-        <Slide key={i} content={content} visible={i === position} />
+      {content.map((c, i) => (
+        <Slide key={i} content={c} visible={i === position} />
       ))}
       <div className="carousel-actions">
         <button id="carousel-button-prev" onClick={() => onChangeSlide(false)}></button>
