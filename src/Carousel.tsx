@@ -1,9 +1,11 @@
 import { invoke } from '@tauri-apps/api/tauri'
-import { appDataDir, join } from '@tauri-apps/api/path';
+import { BaseDirectory, appDataDir, join } from '@tauri-apps/api/path';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { useState, useEffect, useRef } from "react";
 
-import Slide, { Category } from "./Slide.tsx";
+import Slide from "./Slide.tsx";
+
+import Content, { Category } from "./models.ts";
 
 import "./Carousel.css";
 
@@ -22,18 +24,13 @@ const SEED = [
   },
 ]
 
-interface Entry {
-  url: string;
-  category: Category;
-}
-
 interface Props {
   intervalInMs: number;
 }
 
 const Carousel = ({ intervalInMs }: Props) => {
   const [position, setPosition] = useState(0);
-  const [slides, setSlides] = useState<Entry[]>([]);
+  const [slides, setSlides] = useState<Content[]>([]);
   const timerIdRef = useRef(0);
 
   useEffect(() => {
@@ -42,13 +39,22 @@ const Carousel = ({ intervalInMs }: Props) => {
     const fetchAssetUrls = async () => {
       const appDataDirPath = await appDataDir();
 
-      const results = await Promise.all(SEED.map(async ({ filename, category }) => {
-        const filePath = await join(appDataDirPath, `assets/${filename}`);
+      const results: Content[] = await Promise.all(SEED.map(async ({ filename, category }) => {
+        const path = `assets/${filename}`;
+        if (category === Category.Text) {
+          return {
+            kind: category,
+            path: path,
+            base: BaseDirectory.AppData
+          }
+        }
+
+        const filePath = await join(appDataDirPath, path);
         const assetUrl = convertFileSrc(filePath);
 
         return {
+          kind: category,
           url: assetUrl,
-          category,
         }
       }));
 

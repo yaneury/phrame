@@ -2,18 +2,9 @@ import Picture from "./Picture.tsx";
 import Text from "./Text.tsx";
 import Video from "./Video.tsx";
 
+import Content, { Category } from "./models.ts";
+
 import "./Slide.css";
-
-export enum Category {
-  Picture,
-  Video,
-  Text
-}
-
-export interface Content {
-  url: string;
-  category: Category;
-}
 
 interface Props {
   content: Content;
@@ -30,9 +21,9 @@ const Slide = ({ content, visible }: Props) => {
 
   return (
     <div className={classes.join(" ")}>
-      {content.category === Category.Picture && (<Picture url={content.url} />)}
-      {content.category === Category.Video && (<Video url={content.url} onUpdate={console.log} />)}
-      {content.category === Category.Text && (<Text url={content.url} />)}
+      {content.kind === Category.Picture && (<Picture url={content.url} />)}
+      {content.kind === Category.Video && (<Video url={content.url} onUpdate={console.log} />)}
+      {content.kind === Category.Text && (<Text path={content.path} base={content.base} />)}
     </div>
   );
 }
