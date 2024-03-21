@@ -1,8 +1,7 @@
 .container {
-    width: 95vw;
-    height: 95vh;
+    width: 100vw;
+    height: 100vh;
     background-color: #FAF9F6;
-    border: 2px solid #000000;
     position: absolute;
     top: 50%;
     left: 50%;

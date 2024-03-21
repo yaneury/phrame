@@ -22,7 +22,9 @@ const Text = ({ path, base }: Props) => {
   });
 
   return (
-    <p className="text">{text}</p>
+    <div className="text-container">
+      <span className="text">{text}</span>
+    </div>
   )
 }
 

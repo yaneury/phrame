@@ -41,8 +41,7 @@ const Carousel = ({ intervalInMs }: Props) => {
         }
       }));
 
-      setContent(results.filter(c => c.kind == Category.Text));
-      // setContent(results);
+      setContent(results);
     };
 
     fetchContent();
@@ -80,10 +79,12 @@ const Carousel = ({ intervalInMs }: Props) => {
       {content.map((c, i) => (
         <Slide key={i} content={c} visible={i === position} />
       ))}
-      <div className="carousel-actions">
-        <button id="carousel-button-prev" onClick={() => onChangeSlide(false)}></button>
-        <button id="carousel-button-next" onClick={() => onChangeSlide(true)}></button>
-      </div>
+      {import.meta.env.DEV &&
+        <div className="carousel-actions">
+          <button id="carousel-button-prev" onClick={() => onChangeSlide(false)}></button>
+          <button id="carousel-button-next" onClick={() => onChangeSlide(true)}></button>
+        </div>
+      }
     </div>
   );
 }

@@ -5,8 +5,8 @@
 .img-display-portrait {
   width: auto;
   height: auto;
-  max-width: 95vh;
-  max-height: 95vh;
+  max-width: 100vh;
+  max-height: 100vh;
   object-fit: contain;
 }
 
