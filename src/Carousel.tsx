@@ -50,6 +50,8 @@ const Carousel = ({ intervalInMs }: Props) => {
     fetchContent();
   }, []);
 
+  console.log(content)
+
   const startTimer = () => {
     timerIdRef.current = setInterval(() => {
       setPosition((position + 1) % content.length);
