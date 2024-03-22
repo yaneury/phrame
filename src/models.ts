@@ -8,7 +8,7 @@ export enum Category {
 }
 
 export interface Asset {
-  kind: Category.Picture | Category.Video;
+  kind: Category.Picture;
   url: string;
 }
 

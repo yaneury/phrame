@@ -4,10 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "tauri": "tauri"
+    "dev": "vite --mode development",
+    "staging": "vite --mode staging",
+    "build": "tsc && vite build --mode production",
+    "tauri": "tauri",
+    "tauri-staging": "tauri dev --config src-tauri/staging.conf.json"
   },
   "dependencies": {
     "react": "^18.2.0",

@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import Slide from "./Slide.tsx";
 
 import Content, { Category, FetchCommandValue } from "./models.ts";
+import { DEV } from "./config.ts";
 
 import "./Carousel.css";
 
@@ -28,19 +29,21 @@ const Carousel = ({ intervalInMs }: Props) => {
           return {
             kind: Category.Text,
             path,
-            base: BaseDirectory.AppData
+            base: BaseDirectory.AppData,
           }
-        }
+        } else {
+          const filePath = await join(appDataDirPath, path);
+          const assetUrl = convertFileSrc(filePath);
 
-        const filePath = await join(appDataDirPath, path);
-        const assetUrl = convertFileSrc(filePath);
-
-        return {
-          kind: category === "picture" ? Category.Picture : Category.Video,
-          url: assetUrl,
+          return {
+            kind: Category.Picture,
+            url: assetUrl,
+          }
         }
       }));
 
+      // @ts-ignore: Typescript compiler can't deduce that all elements in this list
+      // are of Content[]
       setContent(results);
     };
 
@@ -79,7 +82,7 @@ const Carousel = ({ intervalInMs }: Props) => {
       {content.map((c, i) => (
         <Slide key={i} content={c} visible={i === position} />
       ))}
-      {import.meta.env.DEV &&
+      {DEV &&
         <div className="carousel-actions">
           <button id="carousel-button-prev" onClick={() => onChangeSlide(false)}></button>
           <button id="carousel-button-next" onClick={() => onChangeSlide(true)}></button>
