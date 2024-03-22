@@ -1,3 +1,6 @@
+import { listen } from '@tauri-apps/api/event'
+import { useEffect } from "react";
+
 import Carousel from "./Carousel.tsx";
 
 import "./App.css";
@@ -9,6 +12,16 @@ const App = () => {
     intervalInSeconds,
     mode: import.meta.env.MODE,
   })
+
+  useEffect(() => {
+    const setupEntryListener = async () => {
+      const unlisten = await listen('entries_changed', (event) => {
+        console.log(event)
+      })
+    }
+
+    setupEntryListener();
+  });
 
   return (
     <div className="container">
