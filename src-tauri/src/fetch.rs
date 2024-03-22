@@ -1,17 +1,15 @@
 use {
     serde::Serialize,
-    std::{
-        collections::HashMap, convert::From, fs, path::Path
-    },
+    std::{collections::HashMap, convert::From, fs, path::Path},
 };
 
 #[derive(Serialize, Clone, Debug)]
-#[serde(rename_all="lowercase")]
+#[serde(rename_all = "lowercase")]
 pub enum Category {
     Picture,
     Video,
     Text,
-    Unknown
+    Unknown,
 }
 
 impl From<String> for Category {
@@ -22,10 +20,15 @@ impl From<String> for Category {
             ("gif", Category::Picture),
             ("mp4", Category::Video),
             ("mov", Category::Video),
-            ("txt", Category::Text)
-        ].into_iter().collect();
+            ("txt", Category::Text),
+        ]
+        .into_iter()
+        .collect();
 
-        category_extensions_map.get(extension.as_str()).unwrap_or(&Category::Unknown).clone()
+        category_extensions_map
+            .get(extension.as_str())
+            .unwrap_or(&Category::Unknown)
+            .clone()
     }
 }
 
@@ -47,22 +50,28 @@ pub async fn fetch<R: tauri::Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<En
 
     files
         .into_iter()
-        .map(|path_or| 
-            match path_or {
-                Ok(path) => {
-                    let path = path.path();
-                    let filename = path.file_name().unwrap().to_str().unwrap().to_owned();
-                    let extension = path.extension().unwrap().to_str().unwrap().to_owned();
-                    let category = Category::from(extension.clone());
-                    
-                    return Ok(Entry {
-                        filename: filename,
-                        category: category
-                    })
-                },
-                Err(err) => {
-                    return Err(format!("Failed to unwrap directory entry {}", err));
-                }
+        .map(|path_or| match path_or {
+            Ok(path) => {
+                let path = path.path();
+                let filename = path.file_name().unwrap().to_str().unwrap().to_owned();
+                let extension = path
+                    .extension()
+                    .unwrap()
+                    .to_str()
+                    .unwrap()
+                    .to_owned()
+                    .to_lowercase();
+                let category = Category::from(extension.clone());
+
+                return Ok(Entry {
+                    filename: filename,
+                    category: category,
+                });
+            }
+            Err(err) => {
+                return Err(format!("Failed to unwrap directory entry {}", err));
+            }
         })
         .collect()
 }
+
