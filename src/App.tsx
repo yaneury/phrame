@@ -18,6 +18,8 @@ const App = () => {
       const unlisten = await listen('entries_changed', (event) => {
         console.log(event)
       })
+
+      console.log(unlisten);
     }
 
     setupEntryListener();
