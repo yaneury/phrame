@@ -26,3 +26,11 @@ export interface FetchCommandValue {
   category: "text" | "picture" | "video" | "unknown";
   filename: string;
 }
+
+/*
+
+Memory: A photo, video, or note that my family cherishes.
+  Id: String
+  Source: Url | Path
+
+ */
