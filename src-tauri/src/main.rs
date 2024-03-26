@@ -94,7 +94,7 @@ fn main() {
 }
 
 #[tauri::command]
-async fn fetch_all<R: tauri::Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<Entry>, String> {
+fn fetch_all<R: tauri::Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<Entry>, String> {
     info!("fetch_all invoked");
     let app_data_dir = app
         .path_resolver()
@@ -108,7 +108,7 @@ async fn fetch_all<R: tauri::Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<En
 
     info!("Fetched all files");
 
-    files
+    let files = files
         .into_iter()
         .map(|path_or| match path_or {
             Ok(path) => {
@@ -129,5 +129,9 @@ async fn fetch_all<R: tauri::Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<En
                 return Err(format!("Failed to unwrap directory entry {}", err));
             }
         })
-        .collect()
+        .collect();
+
+    info!("Files: {:?}", files);
+
+    files
 }
