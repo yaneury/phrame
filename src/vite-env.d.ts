@@ -2,6 +2,7 @@
 
 interface ImportMetaEnv {
   readonly VITE_INTERVAL_IN_SECS: string
+  readonly VITE_USE_DATA_DIR: string
 }
 
 interface ImportMeta {

@@ -7,50 +7,28 @@ import Slide from "./Slide.tsx";
 
 import Content, { Category, FetchCommandValue } from "./models.ts";
 import { DEV } from "./config.ts";
+import { fetchSlidesFromDataDirectory, fetchSlidesFromSampleDirectory } from './service.ts';
 
 import "./Carousel.css";
 
 interface Props {
   intervalInMs: number;
+  useDataDir: boolean;
 }
 
-const Carousel = ({ intervalInMs }: Props) => {
+const Carousel = ({ intervalInMs, useDataDir }: Props) => {
   const [position, setPosition] = useState(0);
   const [content, setContent] = useState<Content[]>([]);
   const timerIdRef = useRef(0);
 
   useEffect(() => {
     const fetchContent = async () => {
-      const files: FetchCommandValue[] = await invoke('fetch');
-      const appDataDirPath = await appDataDir();
-      const results = await Promise.all(files.map(async ({ filename, category }) => {
-        const path = `assets/${filename}`;
-        if (category === "text") {
-          return {
-            kind: Category.Text,
-            path,
-            base: BaseDirectory.AppData,
-          }
-        } else {
-          const filePath = await join(appDataDirPath, path);
-          const assetUrl = convertFileSrc(filePath);
-
-          return {
-            kind: Category.Picture,
-            url: assetUrl,
-          }
-        }
-      }));
-
-      // @ts-ignore: Typescript compiler can't deduce that all elements in this list
-      // are of Content[]
+      const results = useDataDir ? await fetchSlidesFromDataDirectory() : fetchSlidesFromSampleDirectory();
       setContent(results);
     };
 
     fetchContent();
   }, []);
-
-  console.log(content)
 
   const startTimer = () => {
     timerIdRef.current = setInterval(() => {
