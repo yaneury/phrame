@@ -36,10 +36,6 @@ export interface ValueResult<T> {
 
 export type Result<T> = ErrorResult | ValueResult<T>;
 
-export interface PendingState {
-  status: 'pending';
-};
-
 export interface LoadingState {
   status: 'loading';
 };
@@ -54,4 +50,4 @@ export interface ErrorState {
   error: string;
 };
 
-export type State<T> = PendingState | LoadingState | SuccessState<T> | ErrorState;
+export type State<T> = LoadingState | SuccessState<T> | ErrorState;

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { info } from "tauri-plugin-log-api";
 
 import Slide from "./Slide.tsx";
 
@@ -15,22 +16,26 @@ interface Props {
 
 const Carousel = ({ intervalInMs, useDataDir }: Props) => {
   const [position, setPosition] = useState(0);
-  const [memories, setMemories] = useState<State<Memory[]>>({ status: "pending" });
+  const [memories, setMemories] = useState<State<Memory[]>>({ status: "loading" });
   const timerIdRef = useRef(0);
 
   useEffect(() => {
-    const fetchContent = async () => {
+    const fetchMemories = async () => {
+      info(`Fetching memories`);
       const maybeMemories = useDataDir ? await fetchMemoriesFromDataDirectory() : fetchMemoriesFromSampleDirectory();
-      console.log(JSON.stringify(maybeMemories))
+
+      info(`Memories fetched: ${JSON.stringify(maybeMemories)}`)
 
       if (maybeMemories.kind === "value") {
+        info(`Fetched ${maybeMemories.value.length} memories`)
         setMemories({ status: "success", value: maybeMemories.value })
       } else {
+        info(`Failed to fetch memories: ${maybeMemories.message}`)
         setMemories({ status: "error", error: maybeMemories.message })
       }
     };
 
-    fetchContent();
+    fetchMemories();
   }, []);
 
   const startTimer = () => {
@@ -68,11 +73,10 @@ const Carousel = ({ intervalInMs, useDataDir }: Props) => {
 
   return (
     <div className="carousel">
-      {memories.status === "pending" && (
-        <p className="white-text">Pending!</p>
-      )}
-      {memories.status === "loading" && (
-        <p className="white-text">Loading!</p>
+      {(memories.status === "loading") && (
+        <div>
+          <p className="white-text">Loading</p>
+        </div>
       )}
       {memories.status === "success" && (
         memories.value.map((memory, i) => (

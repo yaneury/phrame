@@ -4,24 +4,37 @@ import { convertFileSrc } from '@tauri-apps/api/tauri';
 
 import { MediaType, Memory, Result } from './models.ts';
 
-
 const ENTRIES = ["a.jpg", "b.jpg", "c.jpg", "d.jpg", "e.jpg", "f.jpg"]
 
 // Wrapper around invoke that doesn't throw exception
-const invokeNoThrow = async <T>(cmd: string, args?: InvokeArgs | undefined): Promise<Result<T>> => {
-  try {
-    const result = await invoke<T>(cmd, args);
-    return {
-      kind: "value",
-      value: result,
-    };
-  } catch (err: any) {
-    return {
-      kind: "error",
-      // `err` is set to string on the Rust backend side.
-      message: err
-    };
+const invokeNoThrow = async <T>(cmd: string, timeoutInMs: number, args?: InvokeArgs | undefined): Promise<Result<T>> => {
+  const promise = async (): Promise<Result<T>> => {
+    try {
+      const result = await invoke<T>(cmd, args);
+      return {
+        kind: "value",
+        value: result,
+      };
+    } catch (err: any) {
+      return {
+        kind: "error",
+        // `err` is set to string on the Rust backend side.
+        message: err
+      };
+    }
   }
+
+  return Promise.race([
+    promise(),
+    new Promise<Result<T>>((resolve, _) => {
+      setTimeout(() => {
+        resolve({
+          kind: "error",
+          message: `Timeout reached invoking '${cmd}'`
+        })
+      }, timeoutInMs);
+    })
+  ]);
 }
 
 export const fetchMemoriesFromDataDirectory = async (): Promise<Result<Memory[]>> => {
@@ -30,7 +43,7 @@ export const fetchMemoriesFromDataDirectory = async (): Promise<Result<Memory[]>
     filename: string;
   }
 
-  const files: Result<File[]> = await invokeNoThrow('fetch_all');
+  const files: Result<File[]> = await invokeNoThrow('fetch_all', 3000);
 
   if (files.kind === "error") {
     return files;

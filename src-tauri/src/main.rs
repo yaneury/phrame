@@ -2,10 +2,12 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use {
+    log::{error, info},
     notify::{Config, RecommendedWatcher, RecursiveMode, Watcher},
     serde::Serialize,
     std::{collections::HashMap, convert::From, fs},
     tauri::Manager,
+    tauri_plugin_log::LogTarget,
 };
 
 #[derive(Serialize, Clone, Debug)]
@@ -45,6 +47,11 @@ struct Entry {
 
 fn main() {
     tauri::Builder::default()
+        .plugin(
+            tauri_plugin_log::Builder::default()
+                .targets([LogTarget::LogDir, LogTarget::Stdout, LogTarget::Webview])
+                .build(),
+        )
         .setup(|app| {
             let app = app.handle().clone();
 
@@ -64,10 +71,17 @@ fn main() {
                     .watch(app_data_dir.as_ref(), RecursiveMode::Recursive)
                     .expect("Failed to watch directory");
 
+                info!("Installed watcher for $APPDATADIR");
+
                 for res in rx {
                     match res {
-                        Ok(_) => app.emit_all("entries_changed", ()).unwrap(),
-                        Err(error) => eprintln!("Error: {error:?}"),
+                        Ok(_) => {
+                            info!("Entries updated for $APPDATADIR");
+                            app.emit_all("entries_changed", ()).unwrap();
+                        }
+                        Err(e) => {
+                            error!("Failed to watch $APPDATADIR: {:?}", e);
+                        }
                     }
                 }
             });
@@ -81,14 +95,18 @@ fn main() {
 
 #[tauri::command]
 async fn fetch_all<R: tauri::Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<Entry>, String> {
+    info!("fetch_all invoked");
     let app_data_dir = app
         .path_resolver()
         .app_data_dir()
         .ok_or("Failed to resolve $APPDATADIR")?;
 
+    info!("Resolved $APPDATADIR: {:?}", app_data_dir);
     // Fetch all files
     let files =
         fs::read_dir(app_data_dir).map_err(|e| format!("Failed to open $APPDATADIR: {}", e))?;
+
+    info!("Fetched all files");
 
     files
         .into_iter()

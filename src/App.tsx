@@ -1,4 +1,5 @@
 import { listen } from '@tauri-apps/api/event'
+import { info } from "tauri-plugin-log-api";
 import { useEffect } from "react";
 
 import Carousel from "./Carousel.tsx";
@@ -15,11 +16,18 @@ const App = () => {
     mode: import.meta.env.MODE,
   })
 
+  info(`Starting app with ${JSON.stringify({
+    intervalInSeconds,
+    useDataDir,
+    mode: import.meta.env.MODE,
+  })}`)
+
   // Only install listener for data directory if envvar |VITE_USE_DATA_DIR| is true.
   if (useDataDir) {
     useEffect(() => {
       const setupEntryListener = async () => {
         const unlisten = await listen('entries_changed', (event) => {
+          info("Entries changed!")
           console.log(event)
         })
 
