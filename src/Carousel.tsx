@@ -21,6 +21,8 @@ const Carousel = ({ intervalInMs, useDataDir }: Props) => {
   useEffect(() => {
     const fetchContent = async () => {
       const maybeMemories = useDataDir ? await fetchMemoriesFromDataDirectory() : fetchMemoriesFromSampleDirectory();
+      console.log(JSON.stringify(maybeMemories))
+
       if (maybeMemories.kind === "value") {
         setMemories({ status: "success", value: maybeMemories.value })
       } else {
@@ -67,10 +69,10 @@ const Carousel = ({ intervalInMs, useDataDir }: Props) => {
   return (
     <div className="carousel">
       {memories.status === "pending" && (
-        <p>Pending!</p>
+        <p className="white-text">Pending!</p>
       )}
       {memories.status === "loading" && (
-        <p>Loading!</p>
+        <p className="white-text">Loading!</p>
       )}
       {memories.status === "success" && (
         memories.value.map((memory, i) => (
@@ -78,7 +80,7 @@ const Carousel = ({ intervalInMs, useDataDir }: Props) => {
         ))
       )}
       {memories.status === "error" && (
-        <p>Error: {memories.error}</p>
+        <p className="red-text">Error: {memories.error}</p>
       )}
       {DEV &&
         <div className="carousel-actions">

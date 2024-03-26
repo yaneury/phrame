@@ -4,7 +4,7 @@
 use {
     notify::{Config, RecommendedWatcher, RecursiveMode, Watcher},
     serde::Serialize,
-    std::{collections::HashMap, convert::From, fs, path::Path},
+    std::{collections::HashMap, convert::From, fs},
     tauri::Manager,
 };
 
@@ -54,7 +54,6 @@ fn main() {
                     .app_data_dir()
                     .ok_or("Failed to resolve $APPDATADIR")
                     .unwrap();
-                let asset_dir = Path::new(&app_data_dir).join("assets");
 
                 let (tx, rx) = std::sync::mpsc::channel();
 
@@ -62,7 +61,7 @@ fn main() {
                     .expect("Failed to create directory watcher");
 
                 watcher
-                    .watch(asset_dir.as_ref(), RecursiveMode::Recursive)
+                    .watch(app_data_dir.as_ref(), RecursiveMode::Recursive)
                     .expect("Failed to watch directory");
 
                 for res in rx {
@@ -86,11 +85,10 @@ async fn fetch_all<R: tauri::Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<En
         .path_resolver()
         .app_data_dir()
         .ok_or("Failed to resolve $APPDATADIR")?;
-    let asset_dir = Path::new(&app_data_dir).join("assets");
 
     // Fetch all files
     let files =
-        fs::read_dir(asset_dir).map_err(|e| format!("Failed to open $APPDATADIR: {}", e))?;
+        fs::read_dir(app_data_dir).map_err(|e| format!("Failed to open $APPDATADIR: {}", e))?;
 
     files
         .into_iter()

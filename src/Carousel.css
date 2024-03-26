@@ -49,3 +49,11 @@
         opacity: 1;
     }
 }
+
+.white-text {
+    color: white;
+}
+
+.red-text {
+    color: red;
+}

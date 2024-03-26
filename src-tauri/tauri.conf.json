@@ -22,11 +22,11 @@
       "fs": {
         "readFile": true,
         "readDir": true,
-        "scope": ["$APPDATA/assets/*"]
+        "scope": ["$APPDATA/*"]
       },
       "protocol": {
         "asset": true,
-        "assetScope": ["$APPDATA/assets/*"]
+        "assetScope": ["$APPDATA/*"]
       }
     },
     "windows": [

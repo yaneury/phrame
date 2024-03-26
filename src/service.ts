@@ -38,19 +38,25 @@ export const fetchMemoriesFromDataDirectory = async (): Promise<Result<Memory[]>
 
   const appDataDirPath = await appDataDir();
 
-  const results = await Promise.all(files.value.map(async ({ filename, category }) => {
-    const path = `assets/${filename}`;
+  if (files.value.length === 0) {
+    return {
+      kind: "error",
+      message: `${appDataDirPath} has no files.`
+    }
+  }
+
+  const memories: Memory[] = await Promise.all(files.value.map(async ({ filename, category }) => {
     if (category === "text") {
       return {
         created: new Date(),
         source: {
           kind: MediaType.Text,
-          path,
+          path: filename,
           base: BaseDirectory.AppData,
         }
       }
     } else {
-      const filePath = await join(appDataDirPath, path);
+      const filePath = await join(appDataDirPath, filename);
       const assetUrl = convertFileSrc(filePath);
 
       return {
@@ -63,8 +69,10 @@ export const fetchMemoriesFromDataDirectory = async (): Promise<Result<Memory[]>
     }
   }));
 
-  // @ts-ignore
-  return results;
+  return {
+    kind: "value",
+    value: memories,
+  }
 }
 
 export const fetchMemoriesFromSampleDirectory = (): Result<Memory[]> => {
