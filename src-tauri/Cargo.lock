@@ -1954,17 +1954,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "phrame"
-version = "0.0.0"
-dependencies = [
- "notify",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
-]
-
-[[package]]
 name = "pin-project-lite"
 version = "0.2.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3141,6 +3130,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4d127780145176e2b5d16611cc25a900150e86e9fd79d3bde6ff3a37359c9cb5"
 dependencies = [
  "serde_json",
+]
+
+[[package]]
+name = "twyk"
+version = "0.0.1"
+dependencies = [
+ "notify",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
 ]
 
 [[package]]

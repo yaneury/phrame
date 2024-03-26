@@ -1,7 +1,7 @@
 [package]
-name = "phrame"
-version = "0.0.0"
-description = "A digital asset carousel supporting pictures, videos, and text."
+name = "twyk"
+version = "0.0.1"
+description = "A carousel supporting pictures, videos, and text."
 authors = ["Yaneury Fermin <hello@yaneury.com>"]
 edition = "2021"
 

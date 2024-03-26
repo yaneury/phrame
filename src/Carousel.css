@@ -1,20 +1,24 @@
 .carousel {
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: black;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
 }
 
 /* Navigation control styles */
 .carousel .carousel-actions {
     display: flex;
     width: 100%;
-    justify-content: space-between; /* put space between the navigation buttons */
-    position: absolute; /* position navigation buttons on top */
-    top: 50%; /* center navigation buttons on the slide */
-    transform: translateY(-50%); /* align navigation buttons */
+    justify-content: space-between;
+    /* put space between the navigation buttons */
+    position: absolute;
+    /* position navigation buttons on top */
+    top: 50%;
+    /* center navigation buttons on the slide */
+    transform: translateY(-50%);
+    /* align navigation buttons */
 }
 
 .carousel .carousel-actions button {
@@ -40,6 +44,7 @@
     0% {
         opacity: 0;
     }
+
     100% {
         opacity: 1;
     }

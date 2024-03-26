@@ -1,13 +1,10 @@
-import { invoke } from '@tauri-apps/api/tauri'
-import { BaseDirectory, appDataDir, join } from '@tauri-apps/api/path';
-import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { useState, useEffect, useRef } from "react";
 
 import Slide from "./Slide.tsx";
 
-import Content, { Category, FetchCommandValue } from "./models.ts";
+import { Memory, State } from "./models.ts";
 import { DEV } from "./config.ts";
-import { fetchSlidesFromDataDirectory, fetchSlidesFromSampleDirectory } from './service.ts';
+import { fetchMemoriesFromDataDirectory, fetchMemoriesFromSampleDirectory } from './service.ts';
 
 import "./Carousel.css";
 
@@ -18,21 +15,28 @@ interface Props {
 
 const Carousel = ({ intervalInMs, useDataDir }: Props) => {
   const [position, setPosition] = useState(0);
-  const [content, setContent] = useState<Content[]>([]);
+  const [memories, setMemories] = useState<State<Memory[]>>({ status: "pending" });
   const timerIdRef = useRef(0);
 
   useEffect(() => {
     const fetchContent = async () => {
-      const results = useDataDir ? await fetchSlidesFromDataDirectory() : fetchSlidesFromSampleDirectory();
-      setContent(results);
+      const maybeMemories = useDataDir ? await fetchMemoriesFromDataDirectory() : fetchMemoriesFromSampleDirectory();
+      if (maybeMemories.kind === "value") {
+        setMemories({ status: "success", value: maybeMemories.value })
+      } else {
+        setMemories({ status: "error", error: maybeMemories.message })
+      }
     };
 
     fetchContent();
   }, []);
 
   const startTimer = () => {
+    if (memories.status !== "success")
+      return;
+
     timerIdRef.current = setInterval(() => {
-      setPosition((position + 1) % content.length);
+      setPosition((position + 1) % memories.value.length);
     }, intervalInMs);
   }
 
@@ -44,10 +48,13 @@ const Carousel = ({ intervalInMs, useDataDir }: Props) => {
   useEffect(() => {
     startTimer();
     return () => clearInterval(timerIdRef.current);
-  }, [content, position]);
+  }, [memories, position]);
 
   const onChangeSlide = (forward: boolean) => {
-    const size = content.length;
+    if (memories.status !== "success")
+      return;
+
+    const size = memories.value.length;
     if (forward) {
       setPosition((position + 1) % size);
     } else {
@@ -59,9 +66,20 @@ const Carousel = ({ intervalInMs, useDataDir }: Props) => {
 
   return (
     <div className="carousel">
-      {content.map((c, i) => (
-        <Slide key={i} content={c} visible={i === position} />
-      ))}
+      {memories.status === "pending" && (
+        <p>Pending!</p>
+      )}
+      {memories.status === "loading" && (
+        <p>Loading!</p>
+      )}
+      {memories.status === "success" && (
+        memories.value.map((memory, i) => (
+          <Slide key={i} memory={memory} visible={i === position} />
+        ))
+      )}
+      {memories.status === "error" && (
+        <p>Error: {memories.error}</p>
+      )}
       {DEV &&
         <div className="carousel-actions">
           <button id="carousel-button-prev" onClick={() => onChangeSlide(false)}></button>

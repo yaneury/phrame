@@ -75,13 +75,13 @@ fn main() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![fetch])
+        .invoke_handler(tauri::generate_handler![fetch_all])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
 
 #[tauri::command]
-async fn fetch<R: tauri::Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<Entry>, String> {
+async fn fetch_all<R: tauri::Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<Entry>, String> {
     let app_data_dir = app
         .path_resolver()
         .app_data_dir()

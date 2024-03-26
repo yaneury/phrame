@@ -1,16 +1,16 @@
 import Picture from "./Picture.tsx";
 import Text from "./Text.tsx";
 
-import Content, { Category } from "./models.ts";
+import { Memory, MediaType } from "./models.ts";
 
 import "./Slide.css";
 
 interface Props {
-  content: Content;
+  memory: Memory;
   visible: boolean;
 }
 
-const Slide = ({ content, visible }: Props) => {
+const Slide = ({ memory, visible }: Props) => {
   let classes = ["slide"];
   if (visible) {
     classes.push("fade-visible");
@@ -18,10 +18,12 @@ const Slide = ({ content, visible }: Props) => {
     classes.push("hidden")
   }
 
+  const source = memory.source;
+
   return (
     <div className={classes.join(" ")}>
-      {content.kind === Category.Picture && (<Picture url={content.url} />)}
-      {content.kind === Category.Text && (<Text path={content.path} base={content.base} />)}
+      {source.kind === MediaType.Picture && (<Picture url={source.url} />)}
+      {source.kind === MediaType.Text && (<Text path={source.path} base={source.base} />)}
     </div>
   );
 }

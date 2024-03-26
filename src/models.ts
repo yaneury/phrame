@@ -1,36 +1,57 @@
 import { BaseDirectory } from "@tauri-apps/api/fs";
 
-export enum Category {
+export enum MediaType {
   Picture,
-  Video,
   Text,
-  Unknown
+  Unsupported
 }
 
-export interface Asset {
-  kind: Category.Picture;
+export interface Url {
+  kind: MediaType.Picture;
   url: string;
 }
 
 export interface File {
-  kind: Category.Text;
+  kind: MediaType.Text;
   path: string;
   base: BaseDirectory;
 }
 
-export type Content = File | Asset;
+export type Source = File | Url;
 
-export default Content;
-
-export interface FetchCommandValue {
-  category: "text" | "picture" | "video" | "unknown";
-  filename: string;
+export interface Memory {
+  source: Source;
+  created: Date;
 }
 
-/*
+export interface ErrorResult {
+  kind: 'error';
+  message: string;
+}
 
-Memory: A photo, video, or note that my family cherishes.
-  Id: String
-  Source: Url | Path
+export interface ValueResult<T> {
+  kind: 'value';
+  value: T;
+}
 
- */
+export type Result<T> = ErrorResult | ValueResult<T>;
+
+export interface PendingState {
+  status: 'pending';
+};
+
+export interface LoadingState {
+  status: 'loading';
+};
+
+export interface SuccessState<T> {
+  status: 'success';
+  value: T;
+};
+
+export interface ErrorState {
+  status: 'error';
+  error: string;
+};
+
+export type State<T> = PendingState | LoadingState | SuccessState<T> | ErrorState;
