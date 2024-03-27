@@ -34,20 +34,10 @@ export interface ValueResult<T> {
   value: T;
 }
 
-export type Result<T> = ErrorResult | ValueResult<T>;
+export interface LoadingResult {
+  kind: 'loading';
+}
 
-export interface LoadingState {
-  status: 'loading';
-};
+export type Result<T> = ValueResult<T> | ErrorResult;
 
-export interface SuccessState<T> {
-  status: 'success';
-  value: T;
-};
-
-export interface ErrorState {
-  status: 'error';
-  error: string;
-};
-
-export type State<T> = LoadingState | SuccessState<T> | ErrorState;
+export type AwaitableResult<T> = LoadingResult | ValueResult<T> | ErrorResult;
