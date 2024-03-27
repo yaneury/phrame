@@ -1,66 +1,24 @@
 import { useState, useEffect, useRef } from "react";
-import { info } from "tauri-plugin-log-api";
 
 import Slide from "./Slide.tsx";
 
 import { Memory, AwaitableResult } from "./models.ts";
 import { DEV } from "./config.ts";
-import { fetchMemoriesFromDataDirectory, fetchMemoriesFromSampleDirectory } from './service.ts';
 
 import "./Slideshow.css";
 
 interface Props {
-  intervalInMs: number;
-  useDataDir: boolean;
-}
-
-interface State {
-  position: number;
   memories: Memory[];
+  intervalInMs: number;
 }
 
-const SlideShow = ({ intervalInMs, useDataDir }: Props) => {
-  const [state, setState] = useState<AwaitableResult<State>>({ kind: "loading" });
+const SlideShow = ({ memories, intervalInMs }: Props) => {
+  const [position, setPosition] = useState(0);
   const timerIdRef = useRef(0);
 
-  useEffect(() => {
-    const fetchMemories = async () => {
-      info(`Fetching memories`);
-      const maybeMemories = useDataDir ? await fetchMemoriesFromDataDirectory() : fetchMemoriesFromSampleDirectory();
-
-      info(`Memories fetched: ${JSON.stringify(maybeMemories)}`)
-
-      if (maybeMemories.kind === "value") {
-        info(`Fetched ${maybeMemories.value.length} memories`)
-        setState({
-          kind: "value", value: {
-            position: 0,
-            memories: maybeMemories.value
-          }
-        })
-      } else {
-        info(`Failed to fetch memories: ${maybeMemories.message}`)
-        setState({ kind: "error", message: maybeMemories.message })
-      }
-    };
-
-    fetchMemories();
-  }, []);
-
   const startTimer = () => {
-    if (state.kind !== "value")
-      return;
-
-    const { position, memories } = state.value;
-
     timerIdRef.current = setInterval(() => {
-      setState({
-        kind: "value",
-        value: {
-          position: (position + 1) % memories.length,
-          memories,
-        }
-      })
+      setPosition((position + 1) % memories.length);
     }, intervalInMs);
   }
 
@@ -77,40 +35,19 @@ const SlideShow = ({ intervalInMs, useDataDir }: Props) => {
   }, []);
 
   const onChangeSlide = (forward: boolean) => {
-    if (state.kind !== "value")
-      return;
-
     clearInterval(timerIdRef.current);
-
-    const { position, memories } = state.value;
 
     const size = memories.length;
     const newPosition = forward ? (position + 1) % size : (((position - 1) % size) + size) % size
 
-    setState({
-      kind: "value",
-      value: {
-        position: newPosition,
-        memories,
-      }
-    })
+    setPosition(newPosition);
 
-    // resetTimer();
+    resetTimer();
   }
 
   return (
     <div className="carousel">
-      {(state.kind === "loading") && (
-        <div>
-          <p className="white-text">Loading</p>
-        </div>
-      )}
-      {state.kind === "value" && (
-        <Slide memory={state.value.memories[state.value.position]} />
-      )}
-      {state.kind === "error" && (
-        <p className="red-text">Error: {state.message}</p>
-      )}
+      <Slide memory={memories[position]} />
       {DEV &&
         <div className="carousel-actions">
           <button id="carousel-button-prev" onClick={() => onChangeSlide(false)}></button>

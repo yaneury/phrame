@@ -1,46 +1,44 @@
-import { listen } from '@tauri-apps/api/event'
-import { info } from "tauri-plugin-log-api";
-import { useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 
-import SlideShow from "./SlideShow.tsx";
+import { info } from "tauri-plugin-log-api";
+
+import SlideShow from "./Slideshow.tsx";
+import { ConfigContext } from "./ConfigProvider.tsx";
+
+import { fetchMemoriesFromDataDirectory, fetchMemoriesFromSampleDirectory } from './service.ts';
+import { Memory, AwaitableResult } from "./models.ts";
 
 import "./App.css";
 
 const App = () => {
-  const intervalInSeconds = parseInt(import.meta.env.VITE_INTERVAL_IN_SECS ?? 10);
-  const useDataDir = import.meta.env.VITE_USE_DATA_DIR === "true";
+  const [state, setState] = useState<AwaitableResult<Memory[]>>({ kind: "loading" });
+  const { intervalInSeconds, useDataDir } = useContext(ConfigContext);
 
-  console.debug({
-    intervalInSeconds,
-    useDataDir,
-    mode: import.meta.env.MODE,
-  })
+  useEffect(() => {
+    const fetchMemories = async () => {
+      info(`Fetching memories`);
+      const maybeMemories = useDataDir ? await fetchMemoriesFromDataDirectory() : fetchMemoriesFromSampleDirectory();
 
-  info(`Starting app with ${JSON.stringify({
-    intervalInSeconds,
-    useDataDir,
-    mode: import.meta.env.MODE,
-  })}`)
+      info(`Memories fetched: ${JSON.stringify(maybeMemories)}`)
+      setState(maybeMemories);
+    };
 
-  // Only install listener for data directory if envvar |VITE_USE_DATA_DIR| is true.
-  if (useDataDir) {
-    useEffect(() => {
-      const setupEntryListener = async () => {
-        const unlisten = await listen('entries_changed', (event) => {
-          info("Entries changed!")
-          console.log(event)
-        })
-
-        console.log(unlisten);
-      }
-
-      setupEntryListener();
-    });
-  }
+    fetchMemories();
+  }, []);
 
   return (
     <div className="container">
-      <SlideShow intervalInMs={intervalInSeconds * 1000} useDataDir={useDataDir} />
+      {(state.kind === "loading") && (
+        <div>
+          <p className="white-text">Loading</p>
+        </div>
+      )}
+      {state.kind === "value" && (
+        <SlideShow intervalInMs={intervalInSeconds * 1000} memories={state.value} />
+      )}
+      {state.kind === "error" && (
+        <p className="red-text">Error: {state.message}</p>
+      )}
     </div>
   );
 }
