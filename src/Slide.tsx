@@ -13,7 +13,7 @@ const Slide = ({ memory }: Props) => {
   const source = memory.source;
 
   return (
-    <div className="slide fade-visible">
+    <div className="slide">
       {source.kind === MediaType.Picture && (<Picture url={source.url} />)}
       {source.kind === MediaType.Text && (<Text path={source.path} base={source.base} />)}
     </div>

@@ -7,7 +7,7 @@ import { Memory, AwaitableResult } from "./models.ts";
 import { DEV } from "./config.ts";
 import { fetchMemoriesFromDataDirectory, fetchMemoriesFromSampleDirectory } from './service.ts';
 
-import "./Carousel.css";
+import "./Slideshow.css";
 
 interface Props {
   intervalInMs: number;
@@ -19,7 +19,7 @@ interface State {
   memories: Memory[];
 }
 
-const Carousel = ({ intervalInMs, useDataDir }: Props) => {
+const SlideShow = ({ intervalInMs, useDataDir }: Props) => {
   const [state, setState] = useState<AwaitableResult<State>>({ kind: "loading" });
   const timerIdRef = useRef(0);
 
@@ -70,14 +70,17 @@ const Carousel = ({ intervalInMs, useDataDir }: Props) => {
   };
 
   useEffect(() => {
+    console.log("Effected")
     startTimer();
 
     return () => clearInterval(timerIdRef.current);
-  }, [state]);
+  }, []);
 
   const onChangeSlide = (forward: boolean) => {
     if (state.kind !== "value")
       return;
+
+    clearInterval(timerIdRef.current);
 
     const { position, memories } = state.value;
 
@@ -92,7 +95,7 @@ const Carousel = ({ intervalInMs, useDataDir }: Props) => {
       }
     })
 
-    resetTimer();
+    // resetTimer();
   }
 
   return (
@@ -118,4 +121,4 @@ const Carousel = ({ intervalInMs, useDataDir }: Props) => {
   );
 }
 
-export default Carousel;
+export default SlideShow;

@@ -2,7 +2,7 @@ import { listen } from '@tauri-apps/api/event'
 import { info } from "tauri-plugin-log-api";
 import { useEffect } from "react";
 
-import Carousel from "./Carousel.tsx";
+import SlideShow from "./SlideShow.tsx";
 
 import "./App.css";
 
@@ -40,7 +40,7 @@ const App = () => {
 
   return (
     <div className="container">
-      <Carousel intervalInMs={intervalInSeconds * 1000} useDataDir={useDataDir} />
+      <SlideShow intervalInMs={intervalInSeconds * 1000} useDataDir={useDataDir} />
     </div>
   );
 }
