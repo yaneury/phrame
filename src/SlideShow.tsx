@@ -46,12 +46,12 @@ const SlideShow = ({ memories, intervalInMs }: Props) => {
   }
 
   return (
-    <div className="carousel">
+    <div className="slideshow">
       <Slide memory={memories[position]} />
       {DEV &&
-        <div className="carousel-actions">
-          <button id="carousel-button-prev" onClick={() => onChangeSlide(false)}></button>
-          <button id="carousel-button-next" onClick={() => onChangeSlide(true)}></button>
+        <div className="slideshow-actions">
+          <button id="slideshow-button-prev" onClick={() => onChangeSlide(false)}></button>
+          <button id="slideshow-button-next" onClick={() => onChangeSlide(true)}></button>
         </div>
       }
     </div>

@@ -1,4 +1,4 @@
-.carousel {
+.slideshow {
     width: 100vw;
     height: 100vh;
     display: flex;
@@ -8,7 +8,7 @@
 }
 
 /* Navigation control styles */
-.carousel .carousel-actions {
+.slideshow .slideshow-actions {
     display: flex;
     width: 100%;
     justify-content: space-between;
@@ -21,7 +21,7 @@
     /* align navigation buttons */
 }
 
-.carousel .carousel-actions button {
+.slideshow .slideshow-actions button {
     border-radius: 50px;
     background-color: red;
     border: 0;
@@ -32,11 +32,11 @@
     height: 40px;
 }
 
-.carousel .carousel-actions button#carousel-button-prev {
+.slideshow .slideshow-actions button#slideshow-button-prev {
     margin-left: 20px;
 }
 
-.carousel .carousel-actions button#carousel-button-next {
+.slideshow .slideshow-actions button#slideshow-button-next {
     margin-right: 20px;
 }
 
