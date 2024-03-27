@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 
 import Slide from "./Slide.tsx";
 
-import { Memory, AwaitableResult } from "./models.ts";
+import { Memory } from "./models.ts";
 import { DEV } from "./config.ts";
 
 import "./Slideshow.css";
@@ -18,6 +18,9 @@ const Slideshow = ({ memories, intervalInMs }: Props) => {
 
   const startTimer = () => {
     timerIdRef.current = setInterval(() => {
+      console.log("Updating")
+      console.log(`Position: ${position}`)
+      console.log(`Plus: ${(position + 1) % memories.length}`)
       setPosition((position + 1) % memories.length);
     }, intervalInMs);
   }
@@ -32,7 +35,7 @@ const Slideshow = ({ memories, intervalInMs }: Props) => {
     startTimer();
 
     return () => clearInterval(timerIdRef.current);
-  }, []);
+  }, [position]);
 
   const onChangeSlide = (forward: boolean) => {
     clearInterval(timerIdRef.current);
