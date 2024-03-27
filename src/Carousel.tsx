@@ -70,8 +70,7 @@ const Carousel = ({ intervalInMs, useDataDir }: Props) => {
   };
 
   useEffect(() => {
-    if (timerIdRef.current === null)
-      startTimer();
+    startTimer();
 
     return () => clearInterval(timerIdRef.current);
   }, [state]);
@@ -104,9 +103,7 @@ const Carousel = ({ intervalInMs, useDataDir }: Props) => {
         </div>
       )}
       {state.kind === "value" && (
-        state.value.memories.map((memory, i) => (
-          <Slide key={i} memory={memory} visible={i === state.value.position} />
-        ))
+        <Slide memory={state.value.memories[state.value.position]} />
       )}
       {state.kind === "error" && (
         <p className="red-text">Error: {state.message}</p>
