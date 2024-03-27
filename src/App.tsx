@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 
 import { info } from "tauri-plugin-log-api";
 
-import SlideShow from "./Slideshow.tsx";
+import Slideshow from "./Slideshow.tsx";
 import { ConfigContext } from "./ConfigProvider.tsx";
 
 import { fetchMemoriesFromDataDirectory, fetchMemoriesFromSampleDirectory } from './service.ts';
@@ -34,7 +34,7 @@ const App = () => {
         </div>
       )}
       {state.kind === "value" && (
-        <SlideShow intervalInMs={intervalInSeconds * 1000} memories={state.value} />
+        <Slideshow intervalInMs={intervalInSeconds * 1000} memories={state.value} />
       )}
       {state.kind === "error" && (
         <p className="red-text">Error: {state.message}</p>

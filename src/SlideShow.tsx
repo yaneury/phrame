@@ -12,7 +12,7 @@ interface Props {
   intervalInMs: number;
 }
 
-const SlideShow = ({ memories, intervalInMs }: Props) => {
+const Slideshow = ({ memories, intervalInMs }: Props) => {
   const [position, setPosition] = useState(0);
   const timerIdRef = useRef(0);
 
@@ -58,4 +58,4 @@ const SlideShow = ({ memories, intervalInMs }: Props) => {
   );
 }
 
-export default SlideShow;
+export default Slideshow;
