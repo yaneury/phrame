@@ -3,7 +3,7 @@ import { info } from "tauri-plugin-log-api";
 
 import Slide from "./Slide.tsx";
 
-import { Memory, State } from "./models.ts";
+import { Memory, AwaitableResult } from "./models.ts";
 import { DEV } from "./config.ts";
 import { fetchMemoriesFromDataDirectory, fetchMemoriesFromSampleDirectory } from './service.ts';
 
@@ -14,9 +14,13 @@ interface Props {
   useDataDir: boolean;
 }
 
+interface State {
+  position: number;
+  memories: Memory[];
+}
+
 const Carousel = ({ intervalInMs, useDataDir }: Props) => {
-  const [position, setPosition] = useState(0);
-  const [memories, setMemories] = useState<State<Memory[]>>({ status: "loading" });
+  const [state, setState] = useState<AwaitableResult<State>>({ kind: "loading" });
   const timerIdRef = useRef(0);
 
   useEffect(() => {
@@ -28,10 +32,15 @@ const Carousel = ({ intervalInMs, useDataDir }: Props) => {
 
       if (maybeMemories.kind === "value") {
         info(`Fetched ${maybeMemories.value.length} memories`)
-        setMemories({ status: "success", value: maybeMemories.value })
+        setState({
+          kind: "value", value: {
+            position: 0,
+            memories: maybeMemories.value
+          }
+        })
       } else {
         info(`Failed to fetch memories: ${maybeMemories.message}`)
-        setMemories({ status: "error", error: maybeMemories.message })
+        setState({ kind: "error", message: maybeMemories.message })
       }
     };
 
@@ -39,11 +48,19 @@ const Carousel = ({ intervalInMs, useDataDir }: Props) => {
   }, []);
 
   const startTimer = () => {
-    if (memories.status !== "success")
+    if (state.kind !== "value")
       return;
 
+    const { position, memories } = state.value;
+
     timerIdRef.current = setInterval(() => {
-      setPosition((position + 1) % memories.value.length);
+      setState({
+        kind: "value",
+        value: {
+          position: (position + 1) % memories.length,
+          memories,
+        }
+      })
     }, intervalInMs);
   }
 
@@ -53,38 +70,46 @@ const Carousel = ({ intervalInMs, useDataDir }: Props) => {
   };
 
   useEffect(() => {
-    startTimer();
+    if (timerIdRef.current === null)
+      startTimer();
+
     return () => clearInterval(timerIdRef.current);
-  }, [memories, position]);
+  }, [state]);
 
   const onChangeSlide = (forward: boolean) => {
-    if (memories.status !== "success")
+    if (state.kind !== "value")
       return;
 
-    const size = memories.value.length;
-    if (forward) {
-      setPosition((position + 1) % size);
-    } else {
-      setPosition((((position - 1) % size) + size) % size);
-    }
+    const { position, memories } = state.value;
+
+    const size = memories.length;
+    const newPosition = forward ? (position + 1) % size : (((position - 1) % size) + size) % size
+
+    setState({
+      kind: "value",
+      value: {
+        position: newPosition,
+        memories,
+      }
+    })
 
     resetTimer();
   }
 
   return (
     <div className="carousel">
-      {(memories.status === "loading") && (
+      {(state.kind === "loading") && (
         <div>
           <p className="white-text">Loading</p>
         </div>
       )}
-      {memories.status === "success" && (
-        memories.value.map((memory, i) => (
-          <Slide key={i} memory={memory} visible={i === position} />
+      {state.kind === "value" && (
+        state.value.memories.map((memory, i) => (
+          <Slide key={i} memory={memory} visible={i === state.value.position} />
         ))
       )}
-      {memories.status === "error" && (
-        <p className="red-text">Error: {memories.error}</p>
+      {state.kind === "error" && (
+        <p className="red-text">Error: {state.message}</p>
       )}
       {DEV &&
         <div className="carousel-actions">
