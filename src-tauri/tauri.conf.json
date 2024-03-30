@@ -27,6 +27,10 @@
       "protocol": {
         "asset": true,
         "assetScope": ["$APPDATA/*"]
+      },
+      "http": {
+        "all": true,
+        "scope": ["https://localhost/*", "asset://localhost/*"]
       }
     },
     "windows": [
@@ -37,7 +41,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost"
+      "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost; media-src 'self' asset: https://asset.localhost"
     },
     "bundle": {
       "active": true,

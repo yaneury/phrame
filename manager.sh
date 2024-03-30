@@ -28,7 +28,7 @@ case $1 in
         ;;
     "wake")
         invoke "xset -d :0 dpms force on"
-        invoke "sude reboot"
+        invoke "sudo reboot"
         ;;
     "sync")
         rsync -avz --exclude='.DS_Store' $TWYK_MEMORIES $TWYK_USER@$TWYK_HOST:/home/pi/.local/share/com.yaneury.twyk/

@@ -7,22 +7,31 @@ export enum MediaType {
 }
 
 export interface Url {
-  kind: MediaType.Picture;
+  type: "url",
   url: string;
 }
 
 export interface File {
-  kind: MediaType.Text;
+  type: "file",
   path: string;
   base: BaseDirectory;
 }
 
-export type Source = File | Url;
+export type FileOrUrl = File | Url;
 
-export interface Memory {
-  source: Source;
+export interface PictureMemory {
+  type: MediaType.Picture;
+  source: FileOrUrl;
   created: Date;
 }
+
+export interface TextMemory {
+  type: MediaType.Text;
+  source: File;
+  created: Date;
+}
+
+export type Memory = TextMemory | PictureMemory;
 
 export interface ErrorResult {
   kind: 'error';

@@ -2,9 +2,9 @@ import { InvokeArgs, invoke } from '@tauri-apps/api/tauri'
 import { BaseDirectory, appDataDir, join } from '@tauri-apps/api/path';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 
-import { MediaType, Memory, Result } from './models.ts';
+import { MediaType, TextMemory, PictureMemory, Memory, Result } from './models.ts';
 
-const ENTRIES = ["a.jpg", "b.jpg", "c.jpg", "d.jpg", "e.jpg", "f.jpg"]
+const ENTRIES = ["a.jpg", "b.jpg", "c.jpg", "d.jpg", "e.jpg", "f.jpg", "a.heic", "b.heic", "c.heic", "d.heic", "e.heic"]
 
 // Wrapper around invoke that doesn't throw exception
 const invokeNoThrow = async <T>(cmd: string, timeoutInMs: number, args?: InvokeArgs | undefined): Promise<Result<T>> => {
@@ -60,25 +60,9 @@ export const fetchMemoriesFromDataDirectory = async (): Promise<Result<Memory[]>
 
   const memories: Memory[] = await Promise.all(files.value.map(async ({ filename, category }) => {
     if (category === "text") {
-      return {
-        created: new Date(),
-        source: {
-          kind: MediaType.Text,
-          path: filename,
-          base: BaseDirectory.AppData,
-        }
-      }
+      return createTextMemory(filename);
     } else {
-      const filePath = await join(appDataDirPath, filename);
-      const assetUrl = convertFileSrc(filePath);
-
-      return {
-        created: new Date(),
-        source: {
-          kind: MediaType.Picture,
-          url: assetUrl,
-        }
-      }
+      return createPictureMemory(filename);
     }
   }));
 
@@ -93,14 +77,54 @@ export const fetchMemoriesFromSampleDirectory = (): Result<Memory[]> => {
     return {
       created: new Date(),
       source: {
-        kind: MediaType.Picture,
+        type: "url",
         url: `/sample/${e}`
-      }
+      },
+      type: MediaType.Picture,
     }
   });
 
   return {
     kind: "value",
     value: memories,
+  }
+}
+
+const createTextMemory = (filename: string): TextMemory => {
+  return {
+    created: new Date(),
+    source: {
+      type: "file",
+      path: filename,
+      base: BaseDirectory.AppData,
+    },
+    type: MediaType.Text
+  }
+}
+
+const createPictureMemory = async (filename: string): Promise<PictureMemory> => {
+  if (filename.toLowerCase().endsWith("heic")) {
+    return {
+      created: new Date(),
+      source: {
+        type: "file",
+        path: filename,
+        base: BaseDirectory.AppData
+      },
+      type: MediaType.Picture
+    }
+  }
+
+  const appDataDirPath = await appDataDir();
+  const filePath = await join(appDataDirPath, filename);
+  const url = convertFileSrc(filePath);
+
+  return {
+    created: new Date(),
+    source: {
+      type: "url",
+      url
+    },
+    type: MediaType.Picture
   }
 }
