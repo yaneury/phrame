@@ -1,5 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 
+// import { fetch, ResponseType } from "@tauri-apps/api/http"
+
+// @ts-ignore
+import libheif from 'libheif-js/wasm-bundle';
+import { BaseDirectory, readBinaryFile } from "@tauri-apps/api/fs";
+
+import { FileOrUrl } from "./models";
+
 import "./Picture.css";
 
 enum Orientation {
@@ -9,10 +17,20 @@ enum Orientation {
 }
 
 interface Props {
-  url: string;
+  source: FileOrUrl;
 }
 
-const Picture = ({ url }: Props) => {
+const Picture = ({ source }: Props) => {
+
+  return (
+    <>
+      {source.type === "url" && <Img url={source.url} />}
+      {source.type !== "url" && <Canvas path={source.path} base={source.base} />}
+    </>
+  )
+}
+
+const Img = ({ url }: { url: string }) => {
   const [orientation, setOrientation] = useState<Orientation>(Orientation.Pending);
   const imgRef = useRef<HTMLImageElement | null>(null);
 
@@ -29,20 +47,72 @@ const Picture = ({ url }: Props) => {
     }
   }, [url]);
 
-  const getClass = (() => {
-    switch (orientation) {
-      case Orientation.Pending:
-        return "img-display-none"
-      case Orientation.Portrait:
-        return "img-display-portrait"
-      case Orientation.Landscape:
-        return "img-display-landscape"
+  return (
+    <img ref={imgRef} src={url} className={orientationToClass(orientation)} />
+  );
+}
+
+const Canvas = ({ path, base }: { path: string, base: BaseDirectory }) => {
+  const [orientation, setOrientation] = useState<Orientation>(Orientation.Pending);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const loadPicture = async () => {
+      const imageAsBytes = await fetchFileAsArray(path, base);
+      const decoder = new libheif.HeifDecoder();
+      const decodedImage = decoder.decode(imageAsBytes);
+
+      const image = decodedImage[0];
+      const width = image.get_width();
+      const height = image.get_height();
+
+      const isLandscape = width > height;
+      setOrientation(isLandscape ? Orientation.Landscape : Orientation.Portrait);
+
+      canvasRef.current!.width = width;
+      canvasRef.current!.height = height;
+
+      const context = canvasRef.current!.getContext('2d');
+      const imageData = context!.createImageData(width, height)!;
+      await new Promise<void>((resolve, reject) => {
+        image.display(imageData, (displayData: any) => {
+          if (!displayData) {
+            return reject(new Error('HEIF processing error'));
+          }
+
+          resolve();
+        });
+      });
+
+      context!.putImageData(imageData, 0, 0);
     }
+
+    loadPicture();
   });
 
   return (
-    <img ref={imgRef} src={url} className={getClass()} />
-  );
+    <canvas ref={canvasRef} className={orientationToClass(orientation)} />
+  )
 }
+
+const fetchFileAsArray = async (path: string, base: BaseDirectory): Promise<Uint8Array> => {
+  try {
+    return await readBinaryFile(path, { dir: base });
+  } catch (error) {
+    throw Error(`Failed to download ${path}: ${error}`);
+  }
+}
+
+const orientationToClass = (orientation: Orientation): string => {
+  switch (orientation) {
+    case Orientation.Pending:
+      return "img-display-none"
+    case Orientation.Portrait:
+      return "img-display-portrait"
+    case Orientation.Landscape:
+      return "img-display-landscape"
+  }
+}
+
 
 export default Picture;

@@ -10,12 +10,12 @@ interface Props {
 }
 
 const Slide = ({ memory }: Props) => {
-  const source = memory.source;
+  const type = memory.type;
 
   return (
     <div className="slide">
-      {source.kind === MediaType.Picture && (<Picture url={source.url} />)}
-      {source.kind === MediaType.Text && (<Text path={source.path} base={source.base} />)}
+      {type === MediaType.Picture && (<Picture source={memory.source} />)}
+      {type === MediaType.Text && (<Text path={memory.source.path} base={memory.source.base} />)}
     </div>
   );
 }

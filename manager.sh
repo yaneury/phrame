@@ -28,9 +28,10 @@ case $1 in
         ;;
     "wake")
         invoke "xset -d :0 dpms force on"
+        invoke "sudo reboot"
         ;;
     "sync")
-        rsync -avz $TWYK_MEMORIES $TWYK_USER@$TWYK_HOST:/home/pi/.local/share/com.yaneury.twyk/
+        rsync -avz --exclude='.DS_Store' $TWYK_MEMORIES $TWYK_USER@$TWYK_HOST:/home/pi/.local/share/com.yaneury.twyk/
         ;;
     "update")
         TARGET=$(pwd)/src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/deb/twyk_0.0.1_arm64.deb
