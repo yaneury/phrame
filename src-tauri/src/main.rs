@@ -5,7 +5,7 @@ use {
     log::{error, info},
     notify::{Config, RecommendedWatcher, RecursiveMode, Watcher},
     serde::Serialize,
-    std::{collections::HashMap, convert::From, fs},
+    std::{collections::HashMap, convert::From, fs, time::SystemTime},
     tauri::Manager,
     tauri_plugin_log::LogTarget,
 };
@@ -44,6 +44,7 @@ impl From<String> for Category {
 struct Entry {
     filename: String,
     category: Category,
+    created: SystemTime,
 }
 
 fn main() {
@@ -112,9 +113,11 @@ fn fetch_all<R: tauri::Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<Entry>, 
     let files = files
         .into_iter()
         .map(|path_or| match path_or {
-            Ok(path) => {
-                let path = path.path();
+            Ok(entry) => {
+                let path = entry.path();
+
                 let filename = path.file_name().unwrap().to_str().unwrap().to_owned();
+
                 let extension = path
                     .extension()
                     .unwrap()
@@ -124,7 +127,10 @@ fn fetch_all<R: tauri::Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<Entry>, 
                     .to_lowercase();
                 let category = Category::from(extension.clone());
 
-                return Ok(Entry { filename, category });
+                let metadata = entry.metadata().unwrap();
+                let created = metadata.created().unwrap();
+
+                return Ok(Entry { filename, category, created });
             }
             Err(err) => {
                 return Err(format!("Failed to unwrap directory entry {}", err));

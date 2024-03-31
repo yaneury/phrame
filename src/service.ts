@@ -38,9 +38,15 @@ const invokeNoThrow = async <T>(cmd: string, timeoutInMs: number, args?: InvokeA
 }
 
 export const fetchMemoriesFromDataDirectory = async (): Promise<Result<Memory[]>> => {
+  interface Timestamp {
+    secs_since_epoch: number;
+    nanocs_since_epoch: number;
+  }
+
   interface File {
     category: "text" | "picture" | "unsupported";
     filename: string;
+    created: Timestamp;
   }
 
   const files: Result<File[]> = await invokeNoThrow('fetch_all', 3000);
@@ -58,11 +64,12 @@ export const fetchMemoriesFromDataDirectory = async (): Promise<Result<Memory[]>
     }
   }
 
-  const memories: Memory[] = await Promise.all(files.value.map(async ({ filename, category }) => {
+  const memories: Memory[] = await Promise.all(files.value.map(async ({ filename, category, created }) => {
+    const createdAsDate = new Date(created.secs_since_epoch * 1000);
     if (category === "text") {
-      return createTextMemory(filename);
+      return createTextMemory(filename, new Date(createdAsDate));
     } else {
-      return createPictureMemory(filename);
+      return createPictureMemory(filename, new Date(createdAsDate));
     }
   }));
 
@@ -90,9 +97,9 @@ export const fetchMemoriesFromSampleDirectory = (): Result<Memory[]> => {
   }
 }
 
-const createTextMemory = (filename: string): TextMemory => {
+const createTextMemory = (filename: string, created: Date): TextMemory => {
   return {
-    created: new Date(),
+    created,
     source: {
       type: "file",
       path: filename,
@@ -102,10 +109,10 @@ const createTextMemory = (filename: string): TextMemory => {
   }
 }
 
-const createPictureMemory = async (filename: string): Promise<PictureMemory> => {
+const createPictureMemory = async (filename: string, created: Date): Promise<PictureMemory> => {
   if (filename.toLowerCase().endsWith("heic")) {
     return {
-      created: new Date(),
+      created,
       source: {
         type: "file",
         path: filename,
@@ -120,7 +127,7 @@ const createPictureMemory = async (filename: string): Promise<PictureMemory> => 
   const url = convertFileSrc(filePath);
 
   return {
-    created: new Date(),
+    created,
     source: {
       type: "url",
       url

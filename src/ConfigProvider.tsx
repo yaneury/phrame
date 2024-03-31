@@ -5,9 +5,15 @@ import { info } from "tauri-plugin-log-api";
 
 import "./App.css";
 
+export enum SortOrder {
+  Random,
+  Date
+}
+
 interface Config {
   intervalInSeconds: number;
   useDataDir: boolean;
+  sortBy: SortOrder;
   mode: string;
 }
 
@@ -18,6 +24,7 @@ interface Props {
 export const ConfigContext = createContext<Config>({
   intervalInSeconds: parseInt(import.meta.env.VITE_INTERVAL_IN_SECS ?? 10),
   useDataDir: import.meta.env.VITE_USE_DATA_DIR === "true",
+  sortBy: import.meta.env.VITE_SORT_BY === "date" ? SortOrder.Date : SortOrder.Random,
   mode: import.meta.env.MODE,
 });
 
