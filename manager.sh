@@ -6,7 +6,7 @@ if [[ -z "${TWYK_USER}" || -z "${TWYK_HOST}" || -z "${TWYK_MEMORIES}" ]]; then
 fi
 
 usage() {
-    echo "Usage: $0 {sleep|wake|sync|update}"
+    echo "Usage: $0 {sleep|wake|sync|update|debug}"
     exit 1
 }
 
@@ -36,6 +36,14 @@ case $1 in
     "update")
         TARGET=$(pwd)/src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/deb/twyk_0.0.1_arm64.deb
         PKG_CONFIG_SYSROOT_DIR=/usr/aarch64-linux-gnu/ cargo tauri build --target aarch64-unknown-linux-gnu --bundles deb && \
+        scp $TARGET $TWYK_USER@$TWYK_HOST:/home/pi/downloads/twyk.deb && \
+        invoke "sudo dpkg -i /home/pi/downloads/twyk.deb" && \
+        invoke "rm /home/pi/downloads/twyk.deb" && \
+        invoke "sudo reboot"
+        ;;
+    "debug")
+        TARGET=$(pwd)/src-tauri/target/aarch64-unknown-linux-gnu/debug/bundle/deb/twyk_0.0.1_arm64.deb
+        PKG_CONFIG_SYSROOT_DIR=/usr/aarch64-linux-gnu/ cargo tauri build --target aarch64-unknown-linux-gnu --bundles deb --debug && \
         scp $TARGET $TWYK_USER@$TWYK_HOST:/home/pi/downloads/twyk.deb && \
         invoke "sudo dpkg -i /home/pi/downloads/twyk.deb" && \
         invoke "rm /home/pi/downloads/twyk.deb" && \
