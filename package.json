@@ -1,14 +1,15 @@
 {
   "name": "twyk",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "scripts": {
     "dev": "vite --mode development",
     "staging": "vite --mode staging",
     "build": "tsc && vite build --mode production",
     "tauri": "tauri",
-    "tauri-staging": "tauri dev --config src-tauri/staging.conf.json"
+    "tauri-staging": "tauri dev --config src-tauri/staging.conf.json",
+    "postversion": "git push && git push --tags && npm publish"
   },
   "dependencies": {
     "@tauri-apps/api": "^1",
