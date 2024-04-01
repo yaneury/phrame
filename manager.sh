@@ -34,7 +34,8 @@ case $1 in
         rsync -avz --exclude='.DS_Store' $TWYK_MEMORIES $TWYK_USER@$TWYK_HOST:/home/pi/.local/share/com.yaneury.twyk/
         ;;
     "update")
-        TARGET=$(pwd)/src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/deb/twyk_0.0.1_arm64.deb
+        version=$(git describe --tags --abbrev=0 | sed 's/^v//')
+        target="$(pwd)/src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/deb/twyk_${version}_arm64.deb"
         PKG_CONFIG_SYSROOT_DIR=/usr/aarch64-linux-gnu/ cargo tauri build --target aarch64-unknown-linux-gnu --bundles deb && \
         scp $TARGET $TWYK_USER@$TWYK_HOST:/home/pi/downloads/twyk.deb && \
         invoke "sudo dpkg -i /home/pi/downloads/twyk.deb" && \
@@ -42,9 +43,10 @@ case $1 in
         invoke "sudo reboot"
         ;;
     "debug")
-        TARGET=$(pwd)/src-tauri/target/aarch64-unknown-linux-gnu/debug/bundle/deb/twyk_0.0.1_arm64.deb
+        version=$(git describe --tags --abbrev=0 | sed 's/^v//')
+        target="$(pwd)/src-tauri/target/aarch64-unknown-linux-gnu/debug/bundle/deb/twyk_${version}_arm64.deb"
         PKG_CONFIG_SYSROOT_DIR=/usr/aarch64-linux-gnu/ cargo tauri build --target aarch64-unknown-linux-gnu --bundles deb --debug && \
-        scp $TARGET $TWYK_USER@$TWYK_HOST:/home/pi/downloads/twyk.deb && \
+        scp $target $TWYK_USER@$TWYK_HOST:/home/pi/downloads/twyk.deb && \
         invoke "sudo dpkg -i /home/pi/downloads/twyk.deb" && \
         invoke "rm /home/pi/downloads/twyk.deb" && \
         invoke "sudo reboot"
