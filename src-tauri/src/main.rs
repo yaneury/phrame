@@ -4,18 +4,20 @@
 use {
     log::{error, info},
     notify::{Config, RecommendedWatcher, RecursiveMode, Watcher},
-    serde::Serialize,
+    serde::{Deserialize, Serialize},
+    serde_yaml::Value,
     std::{collections::HashMap, convert::From, fs, time::SystemTime},
     tauri::Manager,
     tauri_plugin_log::LogTarget,
 };
 
-#[derive(Serialize, Clone, Debug)]
+const NOTES_FILE: &str = "notes.yaml";
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "lowercase")]
 enum Category {
     Picture,
     Video,
-    Text,
     Unknown,
 }
 
@@ -28,7 +30,6 @@ impl From<String> for Category {
             ("gif", Category::Picture),
             ("mp4", Category::Video),
             ("mov", Category::Video),
-            ("txt", Category::Text),
         ]
         .into_iter()
         .collect();
@@ -40,11 +41,32 @@ impl From<String> for Category {
     }
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 struct Entry {
     filename: String,
     category: Category,
     created: SystemTime,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+struct Quote {
+    body: String,
+    author: String,
+    work: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+struct Document {
+    quotes: Vec<Quote>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+enum Memory {
+    #[serde(rename = "file")]
+    File(Entry),
+
+    #[serde(rename = "payload")]
+    Payload(Quote),
 }
 
 fn main() {
@@ -96,7 +118,7 @@ fn main() {
 }
 
 #[tauri::command]
-fn fetch_all<R: tauri::Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<Entry>, String> {
+fn fetch_all<R: tauri::Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<Memory>, String> {
     info!("fetch_all invoked");
     let app_data_dir = app
         .path_resolver()
@@ -105,10 +127,8 @@ fn fetch_all<R: tauri::Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<Entry>, 
 
     info!("Resolved $APPDATADIR: {:?}", app_data_dir);
     // Fetch all files
-    let files =
-        fs::read_dir(app_data_dir).map_err(|e| format!("Failed to open $APPDATADIR: {}", e))?;
-
-    info!("Fetched all files");
+    let files = fs::read_dir(app_data_dir.clone())
+        .map_err(|e| format!("Failed to open $APPDATADIR: {}", e))?;
 
     let files = files
         .into_iter()
@@ -130,7 +150,11 @@ fn fetch_all<R: tauri::Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<Entry>, 
                 let metadata = entry.metadata().unwrap();
                 let created = metadata.created().unwrap();
 
-                return Ok(Entry { filename, category, created });
+                return Ok(Memory::File(Entry {
+                    filename,
+                    category,
+                    created,
+                }));
             }
             Err(err) => {
                 return Err(format!("Failed to unwrap directory entry {}", err));
@@ -138,7 +162,18 @@ fn fetch_all<R: tauri::Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<Entry>, 
         })
         .collect();
 
-    info!("Files: {:?}", files);
+    info!("Fetched files: {:?}", files);
+
+    info!("Fetching notes");
+    match fs::read_to_string(app_data_dir.join(NOTES_FILE)) {
+        Ok(content) => {
+            let doc: Document = serde_yaml::from_str(&content).unwrap();
+            info!("Document: {:?}", doc);
+        }
+        Err(err) => {
+            error!("Failed to open notes file {}", err);
+        }
+    }
 
     files
 }
