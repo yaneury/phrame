@@ -1,6 +1,9 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod memory;
+mod window;
+
 use {
     log::{error, info},
     notify::{Config, RecommendedWatcher, RecursiveMode, Watcher},
@@ -85,7 +88,6 @@ fn main() {
                     .app_data_dir()
                     .ok_or("Failed to resolve $APPDATADIR")
                     .unwrap();
-
                 let (tx, rx) = std::sync::mpsc::channel();
 
                 let mut watcher = RecommendedWatcher::new(tx, Config::default())
@@ -136,7 +138,7 @@ fn fetch_all<R: tauri::Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<Memory>,
             Ok(entry) => {
                 let path = entry.path();
 
-                let filename = path.file_name().unwrap().to_str().unwrap().to_owned();
+                let filename = path.file_name().ok_or("foo")?.to_str().unwrap().to_owned();
 
                 let extension = path
                     .extension()
