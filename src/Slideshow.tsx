@@ -2,17 +2,18 @@ import { useState, useEffect, useRef } from "react";
 
 import Slide from "./Slide.tsx";
 
-import { Memory } from "./models.ts";
+import { Memory, Musings } from "./models.ts";
 import { DEV } from "./config.ts";
 
 import "./Slideshow.css";
 
 interface Props {
   memories: Memory[];
+  musings: Musings;
   intervalInMs: number;
 }
 
-const Slideshow = ({ memories, intervalInMs }: Props) => {
+const Slideshow = ({ memories, musings, intervalInMs }: Props) => {
   const [position, setPosition] = useState(0);
   const timerIdRef = useRef<number | null>(null);
 

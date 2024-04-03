@@ -32,7 +32,7 @@ export interface Quote {
 }
 
 export interface Musings {
-  quote: Quote[];
+  quotes: Quote[];
 }
 
 export interface ErrorResult {

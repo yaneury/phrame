@@ -4,12 +4,11 @@ use {
     std::{collections::HashMap, convert::From, fs, path::PathBuf, time::SystemTime},
 };
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum Category {
     Picture,
     Video,
-    Text,
     Unknown,
 }
 
@@ -22,7 +21,6 @@ impl From<&str> for Category {
             ("gif", Category::Picture),
             ("mp4", Category::Video),
             ("mov", Category::Video),
-            ("text", Category::Text),
         ]
         .into_iter()
         .collect();
@@ -68,6 +66,10 @@ pub fn fetch_all_memories_in_directory(directory: PathBuf) -> Result<Vec<Memory>
                     .as_ref()
                     .map(|ext| Category::from(ext.as_str()))
                     .unwrap();
+
+                if category == Category::Unknown {
+                    return None;
+                }
 
                 let metadata = entry
                     .metadata()

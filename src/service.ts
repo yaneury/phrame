@@ -2,7 +2,7 @@ import { InvokeArgs, invoke } from '@tauri-apps/api/tauri'
 import { BaseDirectory, appDataDir, join } from '@tauri-apps/api/path';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 
-import { MediaType, Memory, Result } from './models.ts';
+import { MediaType, Memory, Musings, Result } from './models.ts';
 
 const ENTRIES = ["a.jpg", "b.jpg", "c.jpg", "d.jpg", "e.jpg", "f.jpg", "a.heic", "b.heic", "c.heic", "d.heic", "e.heic"]
 
@@ -36,7 +36,6 @@ const invokeNoThrow = async <T>(cmd: string, timeoutInMs: number, args?: InvokeA
     })
   ]);
 }
-
 
 export const fetchMemoriesFromDataDirectory = async (): Promise<Result<Memory[]>> => {
   interface Timestamp {
@@ -80,6 +79,11 @@ export const fetchMemoriesFromDataDirectory = async (): Promise<Result<Memory[]>
   }
 }
 
+export const fetchMusingsFromDataDirectory = async (): Promise<Result<Musings>> => {
+  const musings: Result<Musings> = await invokeNoThrow('fetch_all_musings', 3000);
+  return musings;
+}
+
 export const fetchMemoriesFromSampleDirectory = (): Result<Memory[]> => {
   const memories: Memory[] = ENTRIES.map((e) => {
     return {
@@ -95,6 +99,21 @@ export const fetchMemoriesFromSampleDirectory = (): Result<Memory[]> => {
   return {
     kind: "value",
     value: memories,
+  }
+}
+
+export const fetchMusingsFromSampleDirectory = (): Result<Musings> => {
+  return {
+    kind: "value",
+    value: {
+      quotes: [
+        {
+          body: "You gotta take care of home.",
+          author: "Andrew Wiggins",
+          work: "Some NBA Game",
+        }
+      ]
+    },
   }
 }
 
