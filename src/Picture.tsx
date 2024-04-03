@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import libheif from 'libheif-js/wasm-bundle';
 import { BaseDirectory, readBinaryFile } from "@tauri-apps/api/fs";
 
-import { FileOrUrl } from "./models";
+import { ResourceLocation } from "./models";
 
 import "./Picture.css";
 
@@ -17,15 +17,15 @@ enum Orientation {
 }
 
 interface Props {
-  source: FileOrUrl;
+  location: ResourceLocation;
 }
 
-const Picture = ({ source }: Props) => {
+const Picture = ({ location }: Props) => {
 
   return (
     <>
-      {source.type === "url" && <Img url={source.url} />}
-      {source.type !== "url" && <Canvas path={source.path} base={source.base} />}
+      {location.type === "url" && <Img url={location.url} />}
+      {location.type !== "url" && <Canvas path={location.path} base={location.base} />}
     </>
   )
 }

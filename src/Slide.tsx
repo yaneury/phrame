@@ -1,5 +1,4 @@
 import Picture from "./Picture.tsx";
-import Text from "./Text.tsx";
 
 import { Memory, MediaType } from "./models.ts";
 
@@ -14,8 +13,7 @@ const Slide = ({ memory }: Props) => {
 
   return (
     <div className="slide">
-      {type === MediaType.Picture && (<Picture source={memory.source} />)}
-      {type === MediaType.Text && (<Text path={memory.source.path} base={memory.source.base} />)}
+      {type === MediaType.Picture && (<Picture location={memory.location} />)}
     </div>
   );
 }

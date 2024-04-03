@@ -41,7 +41,7 @@ pub struct Memory {
     created: SystemTime,
 }
 
-pub fn fetch_all_memories(directory: PathBuf) -> Result<Vec<Memory>, String> {
+pub fn fetch_all_memories_in_directory(directory: PathBuf) -> Result<Vec<Memory>, String> {
     info!("Fetching all memories for directory {:?}", directory);
     let files = fs::read_dir(directory).map_err(|e| format!("Failed to open directory: {}", e))?;
 

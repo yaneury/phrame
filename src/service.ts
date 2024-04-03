@@ -2,7 +2,7 @@ import { InvokeArgs, invoke } from '@tauri-apps/api/tauri'
 import { BaseDirectory, appDataDir, join } from '@tauri-apps/api/path';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 
-import { MediaType, TextMemory, PictureMemory, Memory, Result } from './models.ts';
+import { MediaType, Memory, Result } from './models.ts';
 
 const ENTRIES = ["a.jpg", "b.jpg", "c.jpg", "d.jpg", "e.jpg", "f.jpg", "a.heic", "b.heic", "c.heic", "d.heic", "e.heic"]
 
@@ -37,6 +37,7 @@ const invokeNoThrow = async <T>(cmd: string, timeoutInMs: number, args?: InvokeA
   ]);
 }
 
+
 export const fetchMemoriesFromDataDirectory = async (): Promise<Result<Memory[]>> => {
   interface Timestamp {
     secs_since_epoch: number;
@@ -44,12 +45,12 @@ export const fetchMemoriesFromDataDirectory = async (): Promise<Result<Memory[]>
   }
 
   interface File {
-    category: "text" | "picture" | "unsupported";
+    category: "video" | "picture" | "unsupported";
     filename: string;
     created: Timestamp;
   }
 
-  const files: Result<File[]> = await invokeNoThrow('fetch_all', 3000);
+  const files: Result<File[]> = await invokeNoThrow('fetch_all_memories', 3000);
 
   if (files.kind === "error") {
     return files;
@@ -66,8 +67,8 @@ export const fetchMemoriesFromDataDirectory = async (): Promise<Result<Memory[]>
 
   const memories: Memory[] = await Promise.all(files.value.map(async ({ filename, category, created }) => {
     const createdAsDate = new Date(created.secs_since_epoch * 1000);
-    if (category === "text") {
-      return createTextMemory(filename, new Date(createdAsDate));
+    if (category === "video") {
+      return createVideoMemory(filename, new Date(createdAsDate));
     } else {
       return createPictureMemory(filename, new Date(createdAsDate));
     }
@@ -83,7 +84,7 @@ export const fetchMemoriesFromSampleDirectory = (): Result<Memory[]> => {
   const memories: Memory[] = ENTRIES.map((e) => {
     return {
       created: new Date(),
-      source: {
+      location: {
         type: "url",
         url: `/sample/${e}`
       },
@@ -97,23 +98,23 @@ export const fetchMemoriesFromSampleDirectory = (): Result<Memory[]> => {
   }
 }
 
-const createTextMemory = (filename: string, created: Date): TextMemory => {
+const createVideoMemory = (filename: string, created: Date): Memory => {
   return {
     created,
-    source: {
+    location: {
       type: "file",
       path: filename,
       base: BaseDirectory.AppData,
     },
-    type: MediaType.Text
+    type: MediaType.Video
   }
 }
 
-const createPictureMemory = async (filename: string, created: Date): Promise<PictureMemory> => {
+const createPictureMemory = async (filename: string, created: Date): Promise<Memory> => {
   if (filename.toLowerCase().endsWith("heic")) {
     return {
       created,
-      source: {
+      location: {
         type: "file",
         path: filename,
         base: BaseDirectory.AppData
@@ -128,7 +129,7 @@ const createPictureMemory = async (filename: string, created: Date): Promise<Pic
 
   return {
     created,
-    source: {
+    location: {
       type: "url",
       url
     },
