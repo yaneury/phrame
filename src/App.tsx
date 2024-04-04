@@ -6,13 +6,12 @@ import Slideshow from "./Slideshow.tsx";
 import { ConfigContext, SortOrder } from "./ConfigProvider.tsx";
 
 import { fetchMemoriesFromDataDirectory, fetchMemoriesFromSampleDirectory, fetchMusingsFromDataDirectory, fetchMusingsFromSampleDirectory } from './service.ts';
-import { Memory, AwaitableResult, Musings } from "./models.ts";
+import { Memory, AwaitableResult, Musing, Entry } from "./models.ts";
 
 import "./App.css";
 
 interface State {
-  memories: Memory[];
-  musings: Musings;
+  entries: Entry[];
 }
 
 const App = () => {
@@ -39,11 +38,12 @@ const App = () => {
         return;
       }
 
+      let entries: Entry[] = shuffle([...memories, ...maybeMusings.value]);
+
       setState({
         kind: "value",
         value: {
-          memories,
-          musings: maybeMusings.value,
+          entries,
         }
       })
     };
@@ -59,7 +59,7 @@ const App = () => {
         </div>
       )}
       {state.kind === "value" && (
-        <Slideshow intervalInMs={intervalInSeconds * 1000} musings={state.value.musings} memories={state.value.memories} />
+        <Slideshow intervalInMs={intervalInSeconds * 1000} entries={state.value.entries} />
       )}
       {state.kind === "error" && (
         <p className="red-text">Error: {state.message}</p>

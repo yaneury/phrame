@@ -1,19 +1,19 @@
 import { useState, useEffect, useRef } from "react";
 
-import Slide from "./Slide.tsx";
+import MemorySlide from "./MemorySlide.tsx";
 
-import { Memory, Musings } from "./models.ts";
+import { Entry } from "./models.ts";
 import { DEV } from "./config.ts";
 
 import "./Slideshow.css";
+import MusingSlide from "./MusingSlide.tsx";
 
 interface Props {
-  memories: Memory[];
-  musings: Musings;
+  entries: Entry[];
   intervalInMs: number;
 }
 
-const Slideshow = ({ memories, musings, intervalInMs }: Props) => {
+const Slideshow = ({ entries, intervalInMs }: Props) => {
   const [position, setPosition] = useState(0);
   const timerIdRef = useRef<number | null>(null);
 
@@ -22,7 +22,7 @@ const Slideshow = ({ memories, musings, intervalInMs }: Props) => {
       clearInterval(timerIdRef.current);
 
     timerIdRef.current = setInterval(() => {
-      setPosition((position + 1) % memories.length);
+      setPosition((position + 1) % entries.length);
     }, intervalInMs);
   }
 
@@ -35,14 +35,19 @@ const Slideshow = ({ memories, musings, intervalInMs }: Props) => {
   }, [position]);
 
   const onChangeSlide = (forward: boolean) => {
-    const size = memories.length;
+    const size = entries.length;
     const newPosition = forward ? (position + 1) % size : (((position - 1) % size) + size) % size
     setPosition(newPosition);
   }
 
+  const entry = entries[position];
+
+  const bg = entry.kind === "memory" ? "black-bg" : "white-bg";
+
   return (
-    <div className="slideshow">
-      <Slide memory={memories[position]} />
+    <div className={"slideshow" + " " + bg}>
+      {entry.kind === "memory" && <MemorySlide memory={entry} />}
+      {entry.kind === "musing" && <MusingSlide musing={entry} />}
       {DEV &&
         <div className="slideshow-actions">
           <button id="slideshow-button-prev" onClick={() => onChangeSlide(false)}></button>

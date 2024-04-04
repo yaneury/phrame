@@ -2,9 +2,9 @@ import { InvokeArgs, invoke } from '@tauri-apps/api/tauri'
 import { BaseDirectory, appDataDir, join } from '@tauri-apps/api/path';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 
-import { MediaType, Memory, Musings, Result } from './models.ts';
+import { Memory, Musing, Result } from './models.ts';
 
-const ENTRIES = ["a.jpg", "b.jpg", "c.jpg", "d.jpg", "e.jpg", "f.jpg", "a.heic", "b.heic", "c.heic", "d.heic", "e.heic"]
+const ENTRIES = ["a.jpg", "b.jpg", "c.jpg", "d.jpg", "e.jpg", "f.jpg"]
 
 // Wrapper around invoke that doesn't throw exception
 const invokeNoThrow = async <T>(cmd: string, timeoutInMs: number, args?: InvokeArgs | undefined): Promise<Result<T>> => {
@@ -79,8 +79,8 @@ export const fetchMemoriesFromDataDirectory = async (): Promise<Result<Memory[]>
   }
 }
 
-export const fetchMusingsFromDataDirectory = async (): Promise<Result<Musings>> => {
-  const musings: Result<Musings> = await invokeNoThrow('fetch_all_musings', 3000);
+export const fetchMusingsFromDataDirectory = async (): Promise<Result<Musing[]>> => {
+  const musings: Result<Musing[]> = await invokeNoThrow('fetch_all_musings', 3000);
   return musings;
 }
 
@@ -92,7 +92,8 @@ export const fetchMemoriesFromSampleDirectory = (): Result<Memory[]> => {
         type: "url",
         url: `/sample/${e}`
       },
-      type: MediaType.Picture,
+      kind: "memory",
+      type: "picture"
     }
   });
 
@@ -102,43 +103,47 @@ export const fetchMemoriesFromSampleDirectory = (): Result<Memory[]> => {
   }
 }
 
-export const fetchMusingsFromSampleDirectory = (): Result<Musings> => {
+export const fetchMusingsFromSampleDirectory = (): Result<Musing[]> => {
   return {
     kind: "value",
-    value: {
-      quotes: [
-        {
-          body: "You gotta take care of home.",
-          author: "Andrew Wiggins",
-          work: "Some NBA Game",
-        }
-      ]
-    },
+    value: [
+      {
+        kind: "musing",
+        content: {
+            type: "quote",
+            body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ac elit porta tellus lacinia fringilla. Proin quis tortor non odio ornare pellentesque. Donec mi ex, elementum ut risus vel, pretium convallis dui. Donec quis maximus dolor. Morbi porttitor, est vel placerat feugiat, ex tellus viverra odio, id mollis velit augue id ante. Nam laoreet lorem ut tincidunt eleifend. Vestibulum leo neque, imperdiet a aliquet nec, ullamcorper non ligula.",
+            author: "Some person",
+            work: "Somewhere",
+          }
+      },
+    ]
   }
 }
 
 const createVideoMemory = (filename: string, created: Date): Memory => {
   return {
+    kind: "memory",
     created,
     location: {
       type: "file",
       path: filename,
       base: BaseDirectory.AppData,
     },
-    type: MediaType.Video
+    type: "video",
   }
 }
 
 const createPictureMemory = async (filename: string, created: Date): Promise<Memory> => {
   if (filename.toLowerCase().endsWith("heic")) {
     return {
+      kind: "memory",
       created,
       location: {
         type: "file",
         path: filename,
         base: BaseDirectory.AppData
       },
-      type: MediaType.Picture
+      type: "picture",
     }
   }
 
@@ -147,11 +152,12 @@ const createPictureMemory = async (filename: string, created: Date): Promise<Mem
   const url = convertFileSrc(filePath);
 
   return {
+    kind: "memory",
     created,
     location: {
       type: "url",
       url
     },
-    type: MediaType.Picture
+    type: "picture",
   }
 }

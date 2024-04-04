@@ -9,7 +9,8 @@ interface Props {
 const Text = ({ quote }: Props) => {
   return (
     <div className="text-container">
-      <span className="text">{JSON.stringify(quote)}</span>
+      <p className="text quote-body">"{quote.body}"</p>
+      <p className="text quote-author">- {quote.author}</p>
     </div>
   )
 }

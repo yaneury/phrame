@@ -1,11 +1,5 @@
 import { BaseDirectory } from "@tauri-apps/api/fs";
 
-export enum MediaType {
-  Picture,
-  Video,
-  Unsupported
-}
-
 export interface Url {
   type: "url",
   url: string;
@@ -20,20 +14,25 @@ export interface File {
 export type ResourceLocation = File | Url;
 
 export interface Memory {
-  type: MediaType;
+  kind: "memory";
+  type: "picture" | "video" | "unknown";
   location: ResourceLocation;
   created: Date;
 }
 
 export interface Quote {
+  type: "quote";
   body: string;
   author: string;
   work: string;
 }
 
-export interface Musings {
-  quotes: Quote[];
+export interface Musing  {
+  kind: "musing";
+  content: Quote;
 }
+
+export type Entry = Memory | Musing;
 
 export interface ErrorResult {
   kind: 'error';

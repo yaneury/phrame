@@ -1,7 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 
-// import { fetch, ResponseType } from "@tauri-apps/api/http"
-
 // @ts-ignore
 import libheif from 'libheif-js/wasm-bundle';
 import { BaseDirectory, readBinaryFile } from "@tauri-apps/api/fs";
