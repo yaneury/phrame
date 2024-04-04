@@ -38,6 +38,9 @@ const App = () => {
         return;
       }
 
+      console.log([...memories]);
+      console.log(maybeMusings.value)
+      console.log([...maybeMusings.value]);
       let entries: Entry[] = shuffle([...memories, ...maybeMusings.value]);
 
       setState({
@@ -68,7 +71,7 @@ const App = () => {
   );
 }
 
-const shuffle = (elements: Memory[]): Memory[] => {
+const shuffle = (elements: Entry[]): Entry[] => {
   for (let i = 0; i < elements.length; i++) {
     const j = Math.floor(Math.random() * (i + 1));
     [elements[i], elements[j]] = [elements[j], elements[i]];

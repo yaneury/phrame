@@ -2,7 +2,7 @@ import { InvokeArgs, invoke } from '@tauri-apps/api/tauri'
 import { BaseDirectory, appDataDir, join } from '@tauri-apps/api/path';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 
-import { Memory, Musing, Result } from './models.ts';
+import { Memory, Musing, Quote, Result } from './models.ts';
 
 const ENTRIES = ["a.jpg", "b.jpg", "c.jpg", "d.jpg", "e.jpg", "f.jpg"]
 
@@ -80,8 +80,26 @@ export const fetchMemoriesFromDataDirectory = async (): Promise<Result<Memory[]>
 }
 
 export const fetchMusingsFromDataDirectory = async (): Promise<Result<Musing[]>> => {
-  const musings: Result<Musing[]> = await invokeNoThrow('fetch_all_musings', 3000);
-  return musings;
+  interface Musings {
+    quotes: Quote[];
+  }
+
+  const maybeMusings: Result<Musings> = await invokeNoThrow('fetch_all_musings', 3000);
+
+  if (maybeMusings.kind === "error") 
+    return maybeMusings;
+
+  const musings = maybeMusings.value.quotes.map((q) => {
+    return {
+      kind: "musing",
+      content: q
+    } as Musing;
+  })
+
+  return {
+    kind: "value",
+    value: musings,
+  };
 }
 
 export const fetchMemoriesFromSampleDirectory = (): Result<Memory[]> => {
