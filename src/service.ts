@@ -2,9 +2,9 @@ import { InvokeArgs, invoke } from '@tauri-apps/api/tauri'
 import { BaseDirectory, appDataDir, join } from '@tauri-apps/api/path';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 
-import { MediaType, TextMemory, PictureMemory, Memory, Result } from './models.ts';
+import { Memory, Musing, Quote, Result } from './models.ts';
 
-const ENTRIES = ["a.jpg", "b.jpg", "c.jpg", "d.jpg", "e.jpg", "f.jpg", "a.heic", "b.heic", "c.heic", "d.heic", "e.heic"]
+const ENTRIES = ["a.jpg", "b.jpg", "c.jpg", "d.jpg", "e.jpg", "f.jpg"]
 
 // Wrapper around invoke that doesn't throw exception
 const invokeNoThrow = async <T>(cmd: string, timeoutInMs: number, args?: InvokeArgs | undefined): Promise<Result<T>> => {
@@ -44,12 +44,12 @@ export const fetchMemoriesFromDataDirectory = async (): Promise<Result<Memory[]>
   }
 
   interface File {
-    category: "text" | "picture" | "unsupported";
+    category: "video" | "picture" | "unsupported";
     filename: string;
     created: Timestamp;
   }
 
-  const files: Result<File[]> = await invokeNoThrow('fetch_all', 3000);
+  const files: Result<File[]> = await invokeNoThrow('fetch_all_memories', 3000);
 
   if (files.kind === "error") {
     return files;
@@ -66,8 +66,8 @@ export const fetchMemoriesFromDataDirectory = async (): Promise<Result<Memory[]>
 
   const memories: Memory[] = await Promise.all(files.value.map(async ({ filename, category, created }) => {
     const createdAsDate = new Date(created.secs_since_epoch * 1000);
-    if (category === "text") {
-      return createTextMemory(filename, new Date(createdAsDate));
+    if (category === "video") {
+      return createVideoMemory(filename, new Date(createdAsDate));
     } else {
       return createPictureMemory(filename, new Date(createdAsDate));
     }
@@ -79,15 +79,39 @@ export const fetchMemoriesFromDataDirectory = async (): Promise<Result<Memory[]>
   }
 }
 
+export const fetchMusingsFromDataDirectory = async (): Promise<Result<Musing[]>> => {
+  interface Musings {
+    quotes: Quote[];
+  }
+
+  const maybeMusings: Result<Musings> = await invokeNoThrow('fetch_all_musings', 3000);
+
+  if (maybeMusings.kind === "error") 
+    return maybeMusings;
+
+  const musings = maybeMusings.value.quotes.map((q) => {
+    return {
+      kind: "musing",
+      content: q
+    } as Musing;
+  })
+
+  return {
+    kind: "value",
+    value: musings,
+  };
+}
+
 export const fetchMemoriesFromSampleDirectory = (): Result<Memory[]> => {
   const memories: Memory[] = ENTRIES.map((e) => {
     return {
       created: new Date(),
-      source: {
+      location: {
         type: "url",
         url: `/sample/${e}`
       },
-      type: MediaType.Picture,
+      kind: "memory",
+      type: "picture"
     }
   });
 
@@ -97,28 +121,47 @@ export const fetchMemoriesFromSampleDirectory = (): Result<Memory[]> => {
   }
 }
 
-const createTextMemory = (filename: string, created: Date): TextMemory => {
+export const fetchMusingsFromSampleDirectory = (): Result<Musing[]> => {
   return {
+    kind: "value",
+    value: [
+      {
+        kind: "musing",
+        content: {
+            type: "quote",
+            body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ac elit porta tellus lacinia fringilla. Proin quis tortor non odio ornare pellentesque. Donec mi ex, elementum ut risus vel, pretium convallis dui. Donec quis maximus dolor. Morbi porttitor, est vel placerat feugiat, ex tellus viverra odio, id mollis velit augue id ante. Nam laoreet lorem ut tincidunt eleifend. Vestibulum leo neque, imperdiet a aliquet nec, ullamcorper non ligula.",
+            author: "Some person",
+            work: "Somewhere",
+          }
+      },
+    ]
+  }
+}
+
+const createVideoMemory = (filename: string, created: Date): Memory => {
+  return {
+    kind: "memory",
     created,
-    source: {
+    location: {
       type: "file",
       path: filename,
       base: BaseDirectory.AppData,
     },
-    type: MediaType.Text
+    type: "video",
   }
 }
 
-const createPictureMemory = async (filename: string, created: Date): Promise<PictureMemory> => {
+const createPictureMemory = async (filename: string, created: Date): Promise<Memory> => {
   if (filename.toLowerCase().endsWith("heic")) {
     return {
+      kind: "memory",
       created,
-      source: {
+      location: {
         type: "file",
         path: filename,
         base: BaseDirectory.AppData
       },
-      type: MediaType.Picture
+      type: "picture",
     }
   }
 
@@ -127,11 +170,12 @@ const createPictureMemory = async (filename: string, created: Date): Promise<Pic
   const url = convertFileSrc(filePath);
 
   return {
+    kind: "memory",
     created,
-    source: {
+    location: {
       type: "url",
       url
     },
-    type: MediaType.Picture
+    type: "picture",
   }
 }

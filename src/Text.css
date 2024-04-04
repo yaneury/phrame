@@ -4,6 +4,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -11,7 +12,16 @@
 }
 
 .text {
-  font-size: 1.5em;
-  font-family: Chilanka;
-  color: darkslategrey;
+  color: black;
+  line-height: 1em;
+}
+
+.quote-body {
+  font-size: 3em;
+  font-weight: 400;
+}
+
+.quote-author {
+  font-size: 2em;
+  font-weight: 600;
 }

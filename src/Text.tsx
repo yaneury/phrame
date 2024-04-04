@@ -1,29 +1,16 @@
-import { useState, useEffect } from "react";
-
-import { readTextFile, BaseDirectory } from '@tauri-apps/api/fs';
+import { Quote } from "./models";
 
 import "./Text.css";
 
 interface Props {
-  path: string;
-  base: BaseDirectory;
+  quote: Quote;
 }
 
-const Text = ({ path, base }: Props) => {
-  const [text, setText] = useState("");
-
-  useEffect(() => {
-    const fetchText = async () => {
-      const content = await readTextFile(path, { dir: base });
-      setText(content);
-    };
-
-    fetchText();
-  });
-
+const Text = ({ quote }: Props) => {
   return (
     <div className="text-container">
-      <span className="text">{text}</span>
+      <p className="text quote-body">"{quote.body}"</p>
+      <p className="text quote-author">- {quote.author}</p>
     </div>
   )
 }
