@@ -17,6 +17,7 @@ impl From<&str> for Category {
         let category_extensions_map: HashMap<&str, Category> = [
             ("png", Category::Picture),
             ("jpg", Category::Picture),
+            ("jpeg", Category::Picture),
             ("heic", Category::Picture),
             ("gif", Category::Picture),
             ("mp4", Category::Video),
