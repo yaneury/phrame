@@ -1,6 +1,6 @@
 [package]
 name = "twyk"
-version = "0.0.5"
+version = "0.0.6"
 description = "A slideshow supporting pictures, videos, and text."
 authors = ["Yaneury Fermin <hello@yaneury.com>"]
 edition = "2021"
