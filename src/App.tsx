@@ -6,7 +6,7 @@ import Slideshow from "./Slideshow.tsx";
 import { ConfigContext, SortOrder } from "./ConfigProvider.tsx";
 
 import { fetchMemoriesFromDataDirectory, fetchMemoriesFromSampleDirectory, fetchMusingsFromDataDirectory, fetchMusingsFromSampleDirectory } from './service.ts';
-import { Memory, AwaitableResult, Musing, Entry } from "./models.ts";
+import { Memory, AwaitableResult, Entry } from "./models.ts";
 
 import "./App.css";
 
