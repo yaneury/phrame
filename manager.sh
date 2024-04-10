@@ -36,9 +36,14 @@ case $1 in
         dest="$TWYK_USER@$TWYK_HOST:/home/pi/.local/share/com.yaneury.twyk"
         rsync -avz --exclude='.DS_Store' $source $staging
         cd $staging
+        for file in *; do
+          if [ -f "$file" ]; then
+            lowercase=$(echo "$file" | tr '[:upper:]' '[:lower:]')
+            mv -i "$file" "$lowercase"
+          fi
+        done
         heif-convert *.heic -f jpg
-        rm *.heic
-        rsync -avz --exclude='.DS_Store' $staging $dest
+        rsync -avz --exclude='*.heic' $staging $dest
         ;;
     "update")
         # version=$(git describe --tags --abbrev=0 | sed 's/^v//')
